@@ -1,0 +1,133 @@
+<script type="text/javascript">
+    RED.nodes.registerType('shc-config',{
+        category: 'config',
+        defaults: {
+            host: {
+                value: '192.168.0.10',
+                required: true
+            },
+            client: {
+                value: ''
+            },
+            path: {
+                value: '',
+                required: true
+
+            },
+            pollid: {
+                value: ''
+            }
+        },
+        credentials: {
+            password: {
+                type: 'password'
+            }
+        },
+        label: function() {
+            return 'https://' + this.host;
+        },
+        oneditprepare: function () {
+            var hostBoxId = '#node-config-input-host';
+            var hostBoxText = '<input type="text" id="node-config-input-host" placeholder="127.0.0.1" style="width: 100%;">';
+            var hostBoxSelect = '<select id="node-config-input-host" style="width: 100%;" />';
+
+            $.getJSON('/shc/id', {})
+                .done(function(data) {
+                    console.log(data);                 
+                })
+                .fail(function(err) {
+                    RED.notify(err.responseText, "error");
+                });
+
+            $('#node-input-lookup-devices').click( function () {
+                var value = $(hostBoxId).val();
+                if ($(hostBoxId).attr('type') === 'text') {
+                    $(hostBoxId).replaceWith(hostBoxSelect);
+                    discoverShc(value);
+                } else {
+                    $(hostBoxId).replaceWith(hostBoxText);
+                    $(hostBoxId).val(value);
+                }
+            });
+
+            function discoverShc(value) {
+                RED.notify('Searching SHCs in local network, please wait...', 'notice');
+                $.getJSON('/shc/discover', {})
+                .done(function(data) {
+                    console.log(data);
+                    populate(data);
+                    $(hostBoxId).val(value);                    
+                })
+                .fail(function(err) {
+                    RED.notify(err.responseText, "error");
+                });
+            }
+
+            function populate(data) {
+                if (data.length > 0) {
+                    var optGroup = $('<optgroup label="SHC"></optgroup>');
+                    $(deviceBoxId).append(optGroup);
+                    data.reduce(function (parent, shc) {
+                        parent.append(format(shc));
+                        return parent;
+                    }, optGroup);
+                    RED.notify('Done, please select a SHC', 'notice');
+                } else {
+                    RED.notify('No SHC found in local network', 'notice');
+                }
+            }
+
+            function format(shc) {
+                return $('<option/>')
+                    .val(shc.address)
+                    .text('IP: ' + shc.address + ' Mac: ' + shc.fqdn.split('[').pop().split(']')[0]);
+            }
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="shc-config">
+    <h3>Bosch Smart Home Controller</h3>
+    <div class="form-row" style="white-space: nowrap;">
+        <label for="node-config-input-host"><i class="fa fa-globe"></i> Host</label>
+        <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+            <div style="position: absolute; left: 0px; right: 40px;">
+                <input type="text" id="node-config-input-host" placeholder="192.168.0.10" style="width: 100%;">
+            </div>
+            <a id="node-input-lookup-devices" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
+            <i class="fa fa-search"></i></a>
+        </div>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-password"><i class="fa fa-key"></i> Password</label>
+        <input type="password" id="node-config-input-password">
+    </div>
+    <h3>Client Configuration</h3>
+    <div class="form-tips"><b>Hint:</b> Please use the Bosch Smart Home App to delete a client.</div>
+    <h4>Client ID</h4>
+
+    <h4>Client Name</h4>
+    <p>Default: OSS Node-RED-Contrib-Bosch-SHC</p>
+    <div class="form-row">
+        <label for="node-config-input-client"><i class="icon-tag"></i>Suffix</label>
+        <input type="text" id="node-config-input-client">
+    </div>
+    <h4>Certificate & Key</h4>
+    <div class="form-row">
+        <label for="node-config-input-path"><i class="fa fa-key"></i> Path</label>
+        <input type="text" id="node-config-input-path">
+    </div>
+    <h3>Connection</h3>
+    <div class="form-tips"><b>Hint:</b> Please, first press button on SHC until LEDs flashes bevore connecting. 
+    </div>
+    <div class="form-row" style="white-space: nowrap;">
+        <label for="node-config-input-pollid"><i class="fa fa-brackets-curly"></i> Poll Id</label>
+        <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+            <div style="position: absolute; left: 0px; right: 40px;">
+                <input type="text" id="node-config-input-pollid" placeholder="First click button on SHC before adding client" style="width: 100%;">
+            </div>
+            <a id="node-input-connect-shc" title="Register User" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
+            <i class="fa fa-check-circle"></i></a>
+        </div>
+    </div>
+</script>

@@ -1,0 +1,32 @@
+{
+  "name": "node-red-contrib-bosch-shc",
+  "version": "0.0.1",
+  "description": "Bosch Smart Home Controller on Node-RED",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node-red",
+    "bosch",
+    "smart",
+    "home",
+    "controller"
+  ],
+  "author": {
+    "name": "hxmelab",
+    "email": "phil.net@gmx.net"
+  },
+  "license": "MIT",
+  "node-red": {
+    "nodes": {
+      "shc-config": "nodes/shc-config.js",
+      "shc-fault": "nodes/shc-fault.js"
+    }
+  },
+  "dependencies": {
+    "bosch-smart-home-bridge": "0.0.7",
+    "node-dns-sd": "0.4.0",
+    "path": "^0.12.7",
+    "selfsigned": "1.10.4"
+  }
+}

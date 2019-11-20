@@ -1,0 +1,37 @@
+<script type="text/javascript">
+    RED.nodes.registerType('shc-fault', {
+        category: 'BoschSmartHome',
+        color: '#0096ff',
+        outputs: 1,
+        defaults: {
+            'shc': {
+                value: '',
+                type: 'shc-config',
+                required: true
+            },
+            name: {
+                value: ''
+            }
+        },
+        label: function() {
+            return this.name || 'shc faults';
+        },
+        paletteLabel: 'faults',
+        icon: 'alert.png'
+    });
+</script>
+
+<script type="text/x-red" data-template-name="shc-fault">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name">
+    </div>    
+    <div class="form-row">
+        <label for="node-input-shc"><i class="fa fa-globe"></i> SHC</label>
+        <input type="text" id="node-input-shc">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="shc-input">
+    <p>Receive all fault messages from Bosch Smart Home Controller.</p>
+</script>
