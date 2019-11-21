@@ -25,6 +25,8 @@
   },
   "dependencies": {
     "bosch-smart-home-bridge": "0.0.7",
+    "mkdirp": "^0.5.1",
+    "mkdirp-sync": "0.0.3",
     "node-dns-sd": "0.4.0",
     "path": "^0.12.7",
     "selfsigned": "1.10.4"

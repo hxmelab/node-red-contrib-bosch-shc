@@ -3,19 +3,21 @@
         category: 'config',
         defaults: {
             host: {
-                value: '192.168.0.10',
+                value: '',
                 required: true
             },
-            client: {
-                value: ''
+            clientid: {
+                value: '',
+                required: true
+            },
+            clientname: {
+                value: 'Node-RED-Contrib-Bosch-SHC',
+                required: true
             },
             path: {
                 value: '',
                 required: true
 
-            },
-            pollid: {
-                value: ''
             }
         },
         credentials: {
@@ -26,18 +28,27 @@
         label: function() {
             return 'https://' + this.host;
         },
-        oneditprepare: function () {
-            var hostBoxId = '#node-config-input-host';
-            var hostBoxText = '<input type="text" id="node-config-input-host" placeholder="127.0.0.1" style="width: 100%;">';
-            var hostBoxSelect = '<select id="node-config-input-host" style="width: 100%;" />';
+        oneditsave: function() {
 
-            $.getJSON('/shc/id', {})
-                .done(function(data) {
-                    console.log(data);                 
-                })
-                .fail(function(err) {
-                    RED.notify(err.responseText, "error");
-                });
+        },
+        oneditprepare: function () {
+
+            var clientidBoxId = '#node-config-input-clientid';
+            var hostBoxId = '#node-config-input-host';
+            var hostBoxText = '<input type="text" id="node-config-input-host" placeholder="192.168.0.10" style="width: 100%;">';
+            var hostBoxSelect = '<select id="node-config-input-host" style="width: 100%;" />';
+            
+            if (!($('#node-config-input-clientid').val().length > 0)) {
+                $.getJSON('/shc/id', {})
+                    .done(function(data) {
+                        console.log(data);
+                        $('#node-config-input-clientid').val(data);
+                    })
+                    .fail(function(err) {
+                        RED.notify(err.responseText, "error");
+                    });
+            }        
+
 
             $('#node-input-lookup-devices').click( function () {
                 var value = $(hostBoxId).val();
@@ -66,7 +77,7 @@
             function populate(data) {
                 if (data.length > 0) {
                     var optGroup = $('<optgroup label="SHC"></optgroup>');
-                    $(deviceBoxId).append(optGroup);
+                    $(hostBoxId).append(optGroup);
                     data.reduce(function (parent, shc) {
                         parent.append(format(shc));
                         return parent;
@@ -104,13 +115,13 @@
     </div>
     <h3>Client Configuration</h3>
     <div class="form-tips"><b>Hint:</b> Please use the Bosch Smart Home App to delete a client.</div>
-    <h4>Client ID</h4>
-
-    <h4>Client Name</h4>
-    <p>Default: OSS Node-RED-Contrib-Bosch-SHC</p>
     <div class="form-row">
-        <label for="node-config-input-client"><i class="icon-tag"></i>Suffix</label>
-        <input type="text" id="node-config-input-client">
+        <label for="node-config-input-clientid"><i class="icon-tag"></i>Id</label>
+        <input type="text" id="node-config-input-clientid" disabled>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-clientname"><i class="icon-tag"></i>Name</label>
+        <input type="text" id="node-config-input-clientname">
     </div>
     <h4>Certificate & Key</h4>
     <div class="form-row">

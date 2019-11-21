@@ -1,10 +1,11 @@
 "use strict";
 
 const path                      = require('path');
-const caDev                     = path.resolve('C:\\3_tmp\\SHC-Certs\\');
 const {BoschSmartHomeBridge}    = require('bosch-smart-home-bridge');
 const ShcLogger                 = require('./shc-logger');
 const mdns                      = require('node-dns-sd');
+const mkdir                     = require('mkdirp-sync');
+
 
 module.exports = function (RED) {
 
@@ -14,27 +15,35 @@ module.exports = function (RED) {
             RED.nodes.createNode(this, config);
             this.shcid =        config.shcid;
             this.host =         config.host;
-            this.client =       config.client;
+            this.clientid =     config.clientid;
+            this.clientname =   config.clientname;
+            this.pollid =       config.pollid;
             this.path =         config.path;
             this.password =     this.credentials.password;
     
-            console.log("start controller");
 
-            // mkdirp
-            // path.join(RED.settings.userDir, this.shcid)
-            console.log(RED.settings.userDir);
-            this.shc = new BoschSmartHomeBridge('192.168.188.53', 'shc-certs', caDev, new ShcLogger());
+
+            let caDev = path.join(RED.settings.userDir, "certs");
+
+            mkdir(caDev);
+
+
+            //this.shc = new BoschSmartHomeBridge('192.168.0.10', 'client-id', caDev, new ShcLogger());
+            //this.shc.pairIfNeeded('client-name', 'password');
+
             this.pollid = '';
 
-            this.poll();
+            //this.poll();
     
-            this.on('close', this.destructor);
+            //this.on('close', this.destructor);
             
         }
 
         destructor(done) {
             this.unsubscribe().then(done);
         }
+
+        
 
         subscribe() {
             this.shc.getBshcClient().subscribe('').subscribe(result => {
