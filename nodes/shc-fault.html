@@ -11,13 +11,16 @@
             },
             name: {
                 value: ''
+            },
+            debug: {
+                value: false
             }
         },
         label: function() {
             return this.name || 'shc faults';
         },
         paletteLabel: 'faults',
-        icon: 'alert.png'
+        icon: 'debug.png'
     });
 </script>
 
@@ -30,8 +33,20 @@
         <label for="node-input-shc"><i class="fa fa-globe"></i> SHC</label>
         <input type="text" id="node-input-shc">
     </div>
+    <div class="form-row">
+        <label for="node-input-debug"><i class="fa fa-align-justify"></i> Debug</label>
+        <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+            <div style="position: absolute; left: 0px;">
+                <input type="checkbox" id="node-input-debug">
+            </div>
+            <div style="position: absolute; left: 40px; right: 0px;">
+                Receive all messages    
+            </div>
+        </div>
+    </div>
 </script>
 
-<script type="text/x-red" data-help-name="shc-input">
+<script type="text/x-red" data-help-name="shc-fault">
     <p>Receive all fault messages from Bosch Smart Home Controller.</p>
+    <p>Activate Debug to receive all messages from Bosch Smart Home Controller.</p>
 </script>

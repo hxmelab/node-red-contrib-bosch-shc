@@ -9,6 +9,7 @@ module.exports = function (RED) {
 
             this.shcConfig = RED.nodes.getNode(config.shc);
             this.name = config.name;
+            this.debug = config.debug;
 
             
             this.on('input', function(msg, send, done) {
@@ -36,9 +37,10 @@ module.exports = function (RED) {
                     this.status({fill: 'green', shape:'dot', text:'node-red:common.status.connected'});
                     this.listener = (data) => {
                         let parsed = JSON.parse(JSON.stringify(data));
-                        //console.log("data " + JSON.stringify(parsed));
                         parsed.forEach(msg => {
-                            this.send({topic: msg['@type'], payload: msg});
+                            if (this.debug || msg.faults) {
+                                this.send({topic: msg['@type'], payload: msg});
+                            }
                         });
                     }
                     this.shcConfig.addListener("shc-events", this.listener);
