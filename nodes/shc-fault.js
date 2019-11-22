@@ -34,9 +34,6 @@ module.exports = function (RED) {
                     this.status({fill: 'blue', shape:'ring', text:'Add Client'});
                 } else {
                     this.status({fill: 'green', shape:'dot', text:'node-red:common.status.connected'});
-
-
-                    this.shcConfig.addListener("shc-events", this.listener);
                     this.listener = (data) => {
                         let parsed = JSON.parse(JSON.stringify(data));
                         //console.log("data " + JSON.stringify(parsed));
@@ -44,6 +41,7 @@ module.exports = function (RED) {
                             this.send({topic: msg['@type'], payload: msg});
                         });
                     }
+                    this.shcConfig.addListener("shc-events", this.listener);
                 }
             } else {
                 this.status({fill: 'blue', shape:'ring', text:'Add Configuration'});
