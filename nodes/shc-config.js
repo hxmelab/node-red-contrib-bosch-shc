@@ -4,64 +4,65 @@ const path                      = require('path');
 const {BoschSmartHomeBridge}    = require('bosch-smart-home-bridge');
 const ShcLogger                 = require('./shc-logger');
 const mdns                      = require('node-dns-sd');
-const mkdir                     = require('mkdirp-sync');
-
+const mkdirp                    = require('mkdirp');
 
 module.exports = function (RED) {
 
     class ShcConfigNode {
         constructor(config) {
-
+            console.log("[node-red-contrib-bosch-shc] create config node");
             RED.nodes.createNode(this, config);
             this.shcid =        config.shcid;
             this.host =         config.host;
             this.clientid =     config.clientid;
             this.clientname =   config.clientname;
-            this.pollid =       config.pollid;
             this.path =         config.path;
+            this.state =        config.state;
             this.password =     this.credentials.password;
-    
 
+            this.pollid =       '';
+            this.on('close', this.destructor);
 
-            let caDev = path.join(RED.settings.userDir, "certs");
-
-            mkdir(caDev);
-
-
-            //this.shc = new BoschSmartHomeBridge('192.168.0.10', 'client-id', caDev, new ShcLogger());
-            //this.shc.pairIfNeeded('client-name', 'password');
-
-            this.pollid = '';
-
-            //this.poll();
-    
-            //this.on('close', this.destructor);
+            this.certDir = path.join(RED.settings.userDir, "certs");         
+            mkdirp(this.certDir, (err) => {
+                if (err) {
+                    this.error(err);
+                }
+            });
+            
+            this.log(this.state);
+            this.warn("Version: 0.0.3");
+            if (this.state === 'PAIRED') {
+                this.shc = new BoschSmartHomeBridge(this.host, this.clientid, this.certDir, new ShcLogger());
+                this.poll();
+            }
             
         }
 
         destructor(done) {
-            this.unsubscribe().then(done);
+            if (this.pollid.length > 0) {
+                this.unsubscribe().then(done);
+            }
         }
-
-        
 
         subscribe() {
             this.shc.getBshcClient().subscribe('').subscribe(result => {
                 this.pollid = result.result;
-                
-                console.log(this.pollid);
+                this.log('Long polling SHC: ' + this.host + ' with poll Id: ' + this.pollid);
                 this.poll();
+            }, err => {
+                this.error(err);
             });
         };
 
         poll() {
-            console.log('poll', this.pollid)
+            //console.log('poll', this.pollid)
             if (this.pollid.length > 0) {
                 this.shc.getBshcClient().longPolling('', this.pollid).subscribe(data => {
                     if (data.error) {
                         // do some handling
                     } else {
-                        console.log(data.result);
+                        //console.log(data.result);
                         this.emit('shc-events', data.result);
                     }
                     this.poll();
@@ -75,7 +76,7 @@ module.exports = function (RED) {
             return new Promise((resolve, reject) => {
                 if (this.pollid.length > 0) {
                     this.shc.getBshcClient().unsubscribe('', this.pollid).subscribe(() => {
-                        console.log("unsubscribe: " + this.pollid);
+                        this.log('Unsubscribe SHC: ' + this.host + ' with poll Id: ' + this.pollid);
                         resolve();
                     });
                 } else {
@@ -113,7 +114,29 @@ module.exports = function (RED) {
         }).catch((err) => {
             new Error(err);
         });
-        return;
+    });
+
+    /**
+     * Create webhook to add a client
+     */
+    RED.httpAdmin.get('/shc/add_client', (req, result) => {
+
+        let cert = path.join(RED.settings.userDir, "certs");
+        const shc = new BoschSmartHomeBridge(req.query.host, req.query.clientid, cert, new ShcLogger());
+
+        shc.pairIfNeeded(req.query.clientname, req.query.password, 0, 10).subscribe(res => {
+            if (res && res.token) {
+                result.set({'content-type': 'application/json; charset=utf-8'});
+                result.end('PAIRED'); 
+            } else {
+                result.set({'content-type': 'application/json; charset=utf-8'});
+                result.end('ERROR - Wrong Password?');     
+            }
+        }, err => {
+            console.log("[node-red-contrib-bosch-shc] " + err);
+            result.set({'content-type': 'application/json; charset=utf-8'});
+            result.end('ERROR - Button pressed?'); 
+        });
     });
 
 

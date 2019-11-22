@@ -14,10 +14,9 @@
                 value: 'Node-RED-Contrib-Bosch-SHC',
                 required: true
             },
-            path: {
-                value: '',
-                required: true
-
+            state: {
+                value: 'NOT PAIRED',
+                require: true
             }
         },
         credentials: {
@@ -93,6 +92,29 @@
                     .val(shc.address)
                     .text('IP: ' + shc.address + ' Mac: ' + shc.fqdn.split('[').pop().split(']')[0]);
             }
+
+            $('#node-input-pair-shc').click( function() {
+                var host   = $('#node-config-input-host').val();
+                var clientid = $('#node-config-input-clientid').val();
+                var clientname = $('#node-config-input-clientname').val();
+                var password   = $('#node-config-input-password').val();
+                
+                var state  = $('#node-config-input-state').val();
+                if (state === 'PAIRED') {
+                    RED.notify('Client already paired', 'notice');
+                } else {
+                    $.getJSON('/shc/add_client', { 'host': host, 'clientid': clientid, 
+                        'clientname': clientname, 'password': password})
+                    .done(function(data) {
+                        console.log(data);
+                        $('#node-config-input-state').val(data);
+                    })
+                    .fail(function(err) {
+                        $('#node-config-input-state').val(err.responseText);
+                        RED.notify(err.responseText, "error");
+                    });
+                }
+            });
         }
     });
 </script>
@@ -117,28 +139,23 @@
     <div class="form-tips"><b>Hint:</b> Please use the Bosch Smart Home App to delete a client.</div>
     <div class="form-row">
         <label for="node-config-input-clientid"><i class="icon-tag"></i>Id</label>
-        <input type="text" id="node-config-input-clientid" disabled>
+        <input type="text" id="node-config-input-clientid">
     </div>
     <div class="form-row">
         <label for="node-config-input-clientname"><i class="icon-tag"></i>Name</label>
         <input type="text" id="node-config-input-clientname">
     </div>
-    <h4>Certificate & Key</h4>
-    <div class="form-row">
-        <label for="node-config-input-path"><i class="fa fa-key"></i> Path</label>
-        <input type="text" id="node-config-input-path">
-    </div>
-    <h3>Connection</h3>
-    <div class="form-tips"><b>Hint:</b> Please, first press button on SHC until LEDs flashes bevore connecting. 
+    <h3>Pairing</h3>
+    <div class="form-tips"><b>Hint:</b> Please, first press button on SHC until LEDs flashes before pairing. 
     </div>
     <div class="form-row" style="white-space: nowrap;">
-        <label for="node-config-input-pollid"><i class="fa fa-brackets-curly"></i> Poll Id</label>
+        <label for="node-config-input-state"><i class="fa fa-brackets-curly"></i>State</label>
         <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
             <div style="position: absolute; left: 0px; right: 40px;">
-                <input type="text" id="node-config-input-pollid" placeholder="First click button on SHC before adding client" style="width: 100%;">
+                <input type="text" id="node-config-input-state" style="width: 100%;">
             </div>
-            <a id="node-input-connect-shc" title="Register User" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
-            <i class="fa fa-check-circle"></i></a>
+            <a id="node-input-pair-shc" title="Register User" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
+            Pair</a>
         </div>
     </div>
 </script>

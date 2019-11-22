@@ -3,12 +3,12 @@
 module.exports = function (RED) {
 
     class ShcFaultNode {
-        constructor(n) {
+        constructor(config) {
 
-            RED.nodes.createNode(this, n);
+            RED.nodes.createNode(this, config);
 
-            this.shcConfig = RED.nodes.getNode(n.shc);
-            this.name = n.name;
+            this.shcConfig = RED.nodes.getNode(config.shc);
+            this.name = config.name;
 
             
             this.on('input', function(msg, send, done) {
@@ -17,38 +17,37 @@ module.exports = function (RED) {
 
             this.on('close', function(removed, done) {
                 if (removed) {
-                    node.log('SHC fault node removed');
+                    this.log('SHC fault node removed');
                 } else {
-                    node.log('SHC fault node restarted');
+                    this.log('SHC fault node restarted');
                 }
                 done();
             });
 
+            this.registerListener();
+
         }
 
         registerListener() {
-            if (node.shcConfig) {
-
-                node.listener = (data) => {
-                    let parsed = JSON.parse(JSON.stringify(data));
-                    console.log("data " + JSON.stringify(parsed));
-                    parsed.forEach(msg => {
-                        node.send({topic: msg['@type'], payload: msg});
-                    });
-                }
-                
-                node.shcConfig.addListener("shc-events", node.listener);
-                
-                if (node.shcConfig.pollid.length > 0) {
-                    node.status({fill: 'yellow', shape:'ring', text:'node-red:common.status.connecting'});
-                    //node.connect();
-
+            if (this.shcConfig) {
+                if (this.shcConfig.state !== 'PAIRED') {
+                    this.status({fill: 'blue', shape:'ring', text:'Add Client'});
                 } else {
-                    node.status({fill: 'blue', shape:'ring', text:'Add Client'});
+                    this.status({fill: 'green', shape:'dot', text:'node-red:common.status.connected'});
+
+
+                    this.shcConfig.addListener("shc-events", this.listener);
+                    this.listener = (data) => {
+                        let parsed = JSON.parse(JSON.stringify(data));
+                        //console.log("data " + JSON.stringify(parsed));
+                        parsed.forEach(msg => {
+                            this.send({topic: msg['@type'], payload: msg});
+                        });
+                    }
                 }
             } else {
-                node.status({fill: 'blue', shape:'ring', text:'Add Configuration'});
-                node.warn('Add Configuration');
+                this.status({fill: 'blue', shape:'ring', text:'Add Configuration'});
+                this.warn('Add Configuration');
             }
         }
 
