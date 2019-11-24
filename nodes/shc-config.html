@@ -2,7 +2,7 @@
     RED.nodes.registerType('shc-config',{
         category: 'config',
         defaults: {
-            host: {
+            shcip: {
                 value: '',
                 required: true
             },
@@ -25,7 +25,7 @@
             }
         },
         label: function() {
-            return 'https://' + this.host;
+            return 'https://' + this.shcip;
         },
         oneditsave: function() {
 
@@ -33,9 +33,9 @@
         oneditprepare: function () {
 
             var clientidBoxId = '#node-config-input-clientid';
-            var hostBoxId = '#node-config-input-host';
-            var hostBoxText = '<input type="text" id="node-config-input-host" placeholder="192.168.0.10" style="width: 100%;">';
-            var hostBoxSelect = '<select id="node-config-input-host" style="width: 100%;" />';
+            var shcipBoxId = '#node-config-input-shcip';
+            var shcipBoxText = '<input type="text" id="node-config-input-shcip" placeholder="192.168.0.10" style="width: 100%;">';
+            var shcipBoxSelect = '<select id="node-config-input-shcip" style="width: 100%;" />';
             
             if (!($('#node-config-input-clientid').val().length > 0)) {
                 $.getJSON('/shc/id', {})
@@ -50,13 +50,13 @@
 
 
             $('#node-input-lookup-devices').click( function () {
-                var value = $(hostBoxId).val();
-                if ($(hostBoxId).attr('type') === 'text') {
-                    $(hostBoxId).replaceWith(hostBoxSelect);
+                var value = $(shcipBoxId).val();
+                if ($(shcipBoxId).attr('type') === 'text') {
+                    $(shcipBoxId).replaceWith(shcipBoxSelect);
                     discoverShc(value);
                 } else {
-                    $(hostBoxId).replaceWith(hostBoxText);
-                    $(hostBoxId).val(value);
+                    $(shcipBoxId).replaceWith(shcipBoxText);
+                    $(shcipBoxId).val(value);
                 }
             });
 
@@ -66,7 +66,7 @@
                 .done(function(data) {
                     console.log(data);
                     populate(data);
-                    $(hostBoxId).val(value);                    
+                    $(shcipBoxId).val(value);                    
                 })
                 .fail(function(err) {
                     RED.notify(err.responseText, "error");
@@ -76,7 +76,7 @@
             function populate(data) {
                 if (data.length > 0) {
                     var optGroup = $('<optgroup label="SHC"></optgroup>');
-                    $(hostBoxId).append(optGroup);
+                    $(shcipBoxId).append(optGroup);
                     data.reduce(function (parent, shc) {
                         parent.append(format(shc));
                         return parent;
@@ -94,7 +94,7 @@
             }
 
             $('#node-input-pair-shc').click( function() {
-                var host   = $('#node-config-input-host').val();
+                var shcip   = $('#node-config-input-shcip').val();
                 var clientid = $('#node-config-input-clientid').val();
                 var clientname = $('#node-config-input-clientname').val();
                 var password   = $('#node-config-input-password').val();
@@ -103,7 +103,7 @@
                 if (state === 'PAIRED') {
                     RED.notify('Client already paired', 'notice');
                 } else {
-                    $.getJSON('/shc/add_client', { 'host': host, 'clientid': clientid, 
+                    $.getJSON('/shc/add_client', { 'shcip': shcip, 'clientid': clientid, 
                         'clientname': clientname, 'password': password})
                     .done(function(data) {
                         console.log(data);
@@ -122,10 +122,10 @@
 <script type="text/x-red" data-template-name="shc-config">
     <h3>Bosch Smart Home Controller</h3>
     <div class="form-row" style="white-space: nowrap;">
-        <label for="node-config-input-host"><i class="fa fa-globe"></i> Host</label>
+        <label for="node-config-input-shcip"><i class="fa fa-server"></i> Ip</label>
         <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
             <div style="position: absolute; left: 0px; right: 40px;">
-                <input type="text" id="node-config-input-host" placeholder="192.168.0.10" style="width: 100%;">
+                <input type="text" id="node-config-input-shcip" placeholder="192.168.0.10" style="width: 100%;">
             </div>
             <a id="node-input-lookup-devices" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
             <i class="fa fa-search"></i></a>
@@ -135,21 +135,23 @@
         <label for="node-config-input-password"><i class="fa fa-key"></i> Password</label>
         <input type="password" id="node-config-input-password">
     </div>
+
     <h3>Client Configuration</h3>
     <div class="form-tips"><b>Hint:</b> Please use the Bosch Smart Home App to delete a client.</div>
     <div class="form-row">
-        <label for="node-config-input-clientid"><i class="icon-tag"></i>Id</label>
+        <label for="node-config-input-clientid"><i class="fa fa-user"></i>Id</label>
         <input type="text" id="node-config-input-clientid">
     </div>
     <div class="form-row">
-        <label for="node-config-input-clientname"><i class="icon-tag"></i>Name</label>
+        <label for="node-config-input-clientname"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-config-input-clientname">
     </div>
+
     <h3>Pairing</h3>
     <div class="form-tips"><b>Hint:</b> Please, first press button on SHC until LEDs flashes before pairing. 
     </div>
     <div class="form-row" style="white-space: nowrap;">
-        <label for="node-config-input-state"><i class="fa fa-brackets-curly"></i>State</label>
+        <label for="node-config-input-state"><i class="fa fa-handshake-o"></i> State</label>
         <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
             <div style="position: absolute; left: 0px; right: 40px;">
                 <input type="text" id="node-config-input-state" style="width: 100%;">

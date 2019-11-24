@@ -29,21 +29,27 @@ module.exports = function (RED) {
 
         }
 
+        shcEventsHandler = (data) => {
+            if (data.error) {
+                this.status({fill: 'red', shape:'ring', text:'node-red:common.status.disconnected'});
+            } else {
+                this.status({fill: 'green', shape:'dot', text:'node-red:common.status.connected'});
+                let parsed = JSON.parse(JSON.stringify(data));
+                parsed.forEach(msg => {
+                    if (this.debug || msg.faults) {
+                        this.send({topic: 'shc-event', payload: msg});
+                    }
+                });
+            }
+        }
+
         registerListener() {
             if (this.shcConfig) {
                 if (this.shcConfig.state !== 'PAIRED') {
                     this.status({fill: 'blue', shape:'ring', text:'Add Client'});
                 } else {
-                    this.status({fill: 'green', shape:'dot', text:'node-red:common.status.connected'});
-                    this.listener = (data) => {
-                        let parsed = JSON.parse(JSON.stringify(data));
-                        parsed.forEach(msg => {
-                            if (this.debug || msg.faults) {
-                                this.send({topic: msg['@type'], payload: msg});
-                            }
-                        });
-                    }
-                    this.shcConfig.addListener("shc-events", this.listener);
+                    this.status({fill: 'yellow', shape:'dot', text:'node-red:common.status.connecting'});
+                    this.shcConfig.addListener("shc-events", this.shcEventsHandler);
                 }
             } else {
                 this.status({fill: 'blue', shape:'ring', text:'Add Configuration'});
