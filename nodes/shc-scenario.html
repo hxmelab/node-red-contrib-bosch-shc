@@ -1,0 +1,117 @@
+<script type="text/javascript">
+    RED.nodes.registerType('scenario-node',{
+        category: 'BoschSmartHome',
+        color: '#0096ff',
+        defaults: {
+            'shc': {
+                value: '',
+                type: 'shc-config',
+                required: true
+            },
+            scenario: {
+                value: '',
+                required: true
+            },
+            name: {
+                value: ''
+            }
+        },
+        inputs: 1,
+        outputs: 0,
+        icon: "inject.png",
+        label: function() {
+            return this.name || "scenario";
+        },
+        paletteLabel: 'scenario',
+        oneditprepare: function () {
+            var scenarioBoxId     = '#node-input-scenario';
+            var scenarioBoxText   = '<input type="text" id="node-input-scenario" style="width: 100%;">';            
+            var scenarioBoxSelect = '<select id="node-input-scenario" style="width: 100%;" />';
+                
+            function lookupScenarios(value) {
+                var shcConfig = RED.nodes.node($('#node-input-shc').val());
+                var selectScenario = $('#node-input-scenario');       
+
+                function format(scenario) {
+                    return $('<option/>')
+                            .val(scenario.name + '|' + scenario.id)
+                            .text(scenario.name);
+                }
+                
+                function populate(scenarios) {
+                    if (scenarios.length > 0) {                    
+                        var optGroup = $('<optgroup label="Scenarios"></optgroup>');
+                            selectScenario.append(optGroup);
+                            scenarios.reduce(function(parent, scenario) {
+                                parent.append(format(scenario));
+                                return parent;
+                            }, optGroup);
+                        RED.notify('Got it, please select a scenario', 'notice');
+                    } else {
+                        RED.notify('No scenario found', 'notice');
+                    }
+                }
+
+                if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {                
+                    RED.notify('Fetching data, please wait...', 'notice');
+                    $.getJSON('/shc/scenarios', { 'shcip': shcConfig.shcip, 'clientid': shcConfig.clientid})
+                        .done(function(scenarios) {
+                            populate(scenarios);  
+                            $(scenarioBoxId).val(value); 
+                            console.log(scenarios);                     
+                        })
+                        .fail(function(err) {
+                            RED.notify(err.responseText, "error");
+                        });
+                } else {
+                    if (shcConfig) {
+                        RED.notify('Client not added to SHC', 'notice');
+                    } else {
+                        RED.notify('Select SHC or create configuration', 'notice');
+                    }
+                }
+            }
+
+            $('#node-input-lookup-scenario').click( function() {  
+                
+                var value = $(scenarioBoxId).val();
+
+                if ($(scenarioBoxId).attr('type') === 'text') {
+                    $(scenarioBoxId).replaceWith(scenarioBoxSelect);
+                    lookupScenarios(value);
+                } else {
+                    $(scenarioBoxId).replaceWith(scenarioBoxText);
+                    $(scenarioBoxId).val(value);
+                }
+            });
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="scenario-node">
+    <div class="form-row">
+        <label for="node-input-shc"><i class="fa fa-server"></i> SHC</label>
+        <input type="text" id="node-input-shc">
+    </div>
+
+    <div class="form-row" style="white-space: nowrap;">
+        <label for="node-input-scenario"><i class="fa fa-tasks"></i> Scenario</label>
+        <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+          <div style="position: absolute; left: 0px; right: 40px;">
+            <input type="text" id="node-input-scenario" placeholder="No scenario specified" style="width: 100%;" />
+          </div>
+          <a id="node-input-lookup-scenario" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
+            <i class="fa fa-search"></i>
+          </a>
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="scenario-node">
+    <p>Any message input will trigger the configured scenario.</p>
+</script>

@@ -136,12 +136,31 @@ module.exports = function (RED) {
                 result.end('ERROR - Wrong Password?');     
             }
         }, err => {
-            console.log("[node-red-contrib-bosch-shc] " + err);
+            this.error(err);
             result.set({'content-type': 'application/json; charset=utf-8'});
             result.end('ERROR - Button pressed?'); 
         });
     });
 
+    /**
+     * Create webhook to fetch scenario list
+     */    
+    RED.httpAdmin.get('/shc/scenarios', (req, result) => {
+
+        let cert = path.join(RED.settings.userDir, "certs");
+        const shc = new BoschSmartHomeBridge(req.query.shcip, req.query.clientid, cert, new ShcLogger());
+
+        shc.getBshcClient().getScenarios().subscribe(res => {
+            if (res) {
+                result.set({'content-type': 'application/json; charset=utf-8'});
+                result.end(JSON.stringify(res)); 
+            } 
+        }, err => {
+            this.error(err);
+            result.set({'content-type': 'application/json; charset=utf-8'});
+            result.end('[]'); 
+        });
+    });
 
     RED.nodes.registerType('shc-config', ShcConfigNode, {
         credentials: {
