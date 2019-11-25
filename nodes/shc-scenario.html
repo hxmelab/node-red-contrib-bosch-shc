@@ -1,5 +1,5 @@
 <script type="text/javascript">
-    RED.nodes.registerType('scenario-node',{
+    RED.nodes.registerType('shc-scenario',{
         category: 'BoschSmartHome',
         color: '#0096ff',
         defaults: {
@@ -54,7 +54,7 @@
 
                 if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {                
                     RED.notify('Fetching data, please wait...', 'notice');
-                    $.getJSON('/shc/scenarios', { 'shcip': shcConfig.shcip, 'clientid': shcConfig.clientid})
+                    $.getJSON('/shc/scenarios', {'shcip': shcConfig.shcip, 'clientid': shcConfig.clientid})
                         .done(function(scenarios) {
                             populate(scenarios);  
                             $(scenarioBoxId).val(value); 
@@ -88,7 +88,7 @@
     });
 </script>
 
-<script type="text/x-red" data-template-name="scenario-node">
+<script type="text/x-red" data-template-name="shc-scenario">
     <div class="form-row">
         <label for="node-input-shc"><i class="fa fa-server"></i> SHC</label>
         <input type="text" id="node-input-shc">
@@ -112,6 +112,6 @@
     </div>
 </script>
 
-<script type="text/x-red" data-help-name="scenario-node">
+<script type="text/x-red" data-help-name="shc-scenario">
     <p>Any message input will trigger the configured scenario.</p>
 </script>

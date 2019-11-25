@@ -31,9 +31,7 @@ module.exports = function (RED) {
                     this.error(err);
                 }
             });
-            
-            this.log(this.state);
-            this.warn("Version: 0.0.4");
+
             if (this.state === 'PAIRED') {
                 this.shc = new BoschSmartHomeBridge(this.shcip, this.clientid, this.certDir, new ShcLogger());
                 this.poll();
@@ -93,7 +91,7 @@ module.exports = function (RED) {
 
 
     /**
-     * Create webhook for generating an identifier
+     * Webhook for generating an identifier
      */
     RED.httpAdmin.get('/shc/id', (req, result) => {
         result.set({'content-type': 'application/json; charset=utf-8'});
@@ -102,7 +100,7 @@ module.exports = function (RED) {
     });   
 
     /**
-     * Create webhook for discovering SHCs in local network
+     * Webhook for discovering SHCs in local network
      */
     RED.httpAdmin.get('/shc/discover', (req, result) => {
         mdns.discover({name: '_http._tcp.local'}).then((res) => {
@@ -120,9 +118,9 @@ module.exports = function (RED) {
     });
 
     /**
-     * Create webhook to add a client
+     * Webhook to add a client
      */
-    RED.httpAdmin.get('/shc/add_client', (req, result) => {
+    RED.httpAdmin.get('/shc/client', (req, result) => {
 
         let cert = path.join(RED.settings.userDir, "certs");
         const shc = new BoschSmartHomeBridge(req.query.shcip, req.query.clientid, cert, new ShcLogger());
@@ -143,7 +141,7 @@ module.exports = function (RED) {
     });
 
     /**
-     * Create webhook to fetch scenario list
+     * Webhook to fetch scenario list
      */    
     RED.httpAdmin.get('/shc/scenarios', (req, result) => {
 
@@ -161,6 +159,66 @@ module.exports = function (RED) {
             result.end('[]'); 
         });
     });
+
+    /**
+     * Webhook to fetch room list
+     */    
+    RED.httpAdmin.get('/shc/rooms', (req, result) => {
+
+        let cert = path.join(RED.settings.userDir, "certs");
+        const shc = new BoschSmartHomeBridge(req.query.shcip, req.query.clientid, cert, new ShcLogger());
+
+        shc.getBshcClient().getRooms().subscribe(res => {
+            if (res) {
+                result.set({'content-type': 'application/json; charset=utf-8'});
+                result.end(JSON.stringify(res)); 
+            } 
+        }, err => {
+            this.error(err);
+            result.set({'content-type': 'application/json; charset=utf-8'});
+            result.end('[]'); 
+        });
+    });    
+
+    /**
+     * Webhook to fetch device list
+     */    
+    RED.httpAdmin.get('/shc/devices', (req, result) => {
+
+        let cert = path.join(RED.settings.userDir, "certs");
+        const shc = new BoschSmartHomeBridge(req.query.shcip, req.query.clientid, cert, new ShcLogger());
+
+        shc.getBshcClient().getDevices().subscribe(res => {
+            if (res) {
+                result.set({'content-type': 'application/json; charset=utf-8'});
+                result.end(JSON.stringify(res)); 
+            } 
+        }, err => {
+            this.error(err);
+            result.set({'content-type': 'application/json; charset=utf-8'});
+            result.end('[]'); 
+        });
+    });
+
+    /**
+     * Webhook to fetch device list
+     */    
+    RED.httpAdmin.get('/shc/services', (req, result) => {
+
+        let cert = path.join(RED.settings.userDir, "certs");
+        const shc = new BoschSmartHomeBridge(req.query.shcip, req.query.clientid, cert, new ShcLogger());
+
+        shc.getBshcClient().getDeviceServices().subscribe(res => {
+            if (res) {
+                result.set({'content-type': 'application/json; charset=utf-8'});
+                result.end(JSON.stringify(res)); 
+            } 
+        }, err => {
+            this.error(err);
+            result.set({'content-type': 'application/json; charset=utf-8'});
+            result.end('[]'); 
+        });
+    });    
 
     RED.nodes.registerType('shc-config', ShcConfigNode, {
         credentials: {

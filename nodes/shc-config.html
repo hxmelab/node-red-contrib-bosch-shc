@@ -103,7 +103,7 @@
                 if (state === 'PAIRED') {
                     RED.notify('Client already paired', 'notice');
                 } else {
-                    $.getJSON('/shc/add_client', { 'shcip': shcip, 'clientid': clientid, 
+                    $.getJSON('/shc/client', { 'shcip': shcip, 'clientid': clientid, 
                         'clientname': clientname, 'password': password})
                     .done(function(data) {
                         console.log(data);
@@ -139,7 +139,7 @@
     <h3>Client Configuration</h3>
     <div class="form-tips"><b>Hint:</b> Please use the Bosch Smart Home App to delete a client.</div>
     <div class="form-row">
-        <label for="node-config-input-clientid"><i class="fa fa-user"></i>Id</label>
+        <label for="node-config-input-clientid"><i class="fa fa-user"></i> Id</label>
         <input type="text" id="node-config-input-clientid">
     </div>
     <div class="form-row">
