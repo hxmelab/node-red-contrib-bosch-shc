@@ -1,0 +1,240 @@
+<script type="text/javascript">
+    RED.nodes.registerType('shc-device',{
+        category: 'BoschSmartHome',
+        color: '#0096ff',
+        defaults: {
+            'shc': {
+                value: '',
+                type: 'shc-config',
+                required: true
+            },
+            device: {
+                value: '',
+                required: true
+            },
+            service: {
+                value: 'all',
+                required: true
+            },
+            state: {
+                value: ''
+            },
+            name: {
+                value: ''
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "bosch-smarthome-icon.png",
+        label: function() {
+            return this.name || "shc device";
+        },
+        paletteLabel: 'device',
+        oneditprepare: function () {
+            var deviceBoxId = '#node-input-device';
+            var deviceBoxText = '<input type="text" id="node-input-device" placeholder="Select a device" style="width: 100%;">';
+            var deviceBoxSelect = '<select id="node-input-device" style="width: 100%;" />';
+
+            function lookupDevices(value) {
+                var shcConfig = RED.nodes.node($('#node-input-shc').val());
+                var selectDevice = $('#node-input-device');
+
+                function format(device) {
+                    var services = '';
+                    for (var i = 0; i < device.deviceServiceIds.length; i++) {
+                        if (i === 0) {
+                            services = device.deviceServiceIds[i];
+                        } else {
+                            services = services + ',' + device.deviceServiceIds[i];
+                        }
+                    }
+                    return $('<option/>')
+                        .val(device.name + '|' + device.id + '|' + device.deviceModel + '|' + services)
+                        .text(device.name);
+                }
+
+                function getRoomName(roomId, rooms) {
+                    var roomName = 'No room defined'
+                    rooms.forEach(function (element) {
+                        if (element.id === roomId) {
+                            roomName = element.name;
+                        }
+                    }, this);
+                    return roomName;
+                }
+            
+                function isSupported(model) {
+                    const supportedDevices = "CAMERA_360, CAMERA_EYES, BBL, BSM, " +
+                                "INTRUSION_DETECTION_SYSTEM, MD, PSM, PRESENCE_SIMULATION_SERVICE, " + 
+                                "ROOM_CLIMATE_CONTROL, SD, SWD, TWINGUARD, WRC2";
+                    return (supportedDevices.indexOf(model) !== -1);
+                }
+
+                function filterDevices(roomId, devices) {
+                    var filterList = [];
+                    devices.forEach(function (element) {
+                        if (isSupported(element.deviceModel) && element.roomId === roomId) {
+                            filterList.push(element);
+                        }
+                    }, this);
+                    return filterList;
+                }
+
+                function filterUndefinedRoom(devices) {
+                    var filterList = [];
+                    devices.forEach(function (element) {
+                        if (isSupported(element.deviceModel) && typeof element.roomId == 'undefined') {
+                            filterList.push(element);
+                        }
+                    }, this);
+                    return filterList;
+                }
+
+                function populate(rooms, devices) {
+                    if (devices.length > 0 && rooms.length > 0) {
+                        var serviceList = filterUndefinedRoom(devices);
+                        if (serviceList.length > 0) {
+                            var serviceGroup = $('<optgroup label="Without Room"></optgroup>');
+                            selectDevice.append(serviceGroup);
+                            serviceList.reduce(function (parent, service) {
+                                parent.append(format(service));
+                                return parent;
+                            }, serviceGroup);
+                        }
+                        rooms.forEach(function (element) {
+                            var roomName = getRoomName(element.id, rooms);
+                            var deviceList = filterDevices(element.id, devices);
+
+                            var optGroup = $('<optgroup label="' + roomName + '"></optgroup>');
+                            selectDevice.append(optGroup);
+                            deviceList.reduce(function (parent, device) {
+                                parent.append(format(device));
+                                return parent;
+                            }, optGroup);
+                        }, this);
+
+                        RED.notify('Got it, please select a device', 'notice');
+                    } else {
+                        RED.notify('No device found', 'notice');
+                    }
+                }
+                if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {
+                    RED.notify('Fetching data, please wait...', 'notice');
+                    $.getJSON('/shc/devices', {'shcip': shcConfig.shcip, 'clientid': shcConfig.clientid})
+                        .done(function (devices) {
+                            $.getJSON('/shc/rooms', {'shcip': shcConfig.shcip, 'clientid': shcConfig.clientid})
+                                .done(function (rooms) {
+                                    populate(rooms, devices);
+                                    console.log(rooms);
+                                })
+                                .fail(function (err) {
+                                    RED.notify(err.responseText, "error");
+                                });
+                            console.log(devices);
+                        })
+                        .fail(function (err) {
+                            RED.notify(err.responseText, "error");
+                        });
+                } else {
+                    if (shcConfig) {
+                        RED.notify('Client not added to SHC', 'notice');
+                    } else {
+                        RED.notify('Select a controller or create one', 'notice');
+                    }
+                }
+            }
+
+            $('#node-input-lookup-device').click( function() {  
+                
+                var value = $(deviceBoxId).val();
+
+                if ($(deviceBoxId).attr('type') === 'text') {
+                    $(deviceBoxId).replaceWith(deviceBoxSelect);
+                    lookupDevices(value);
+                } else {
+                    $(deviceBoxId).replaceWith(deviceBoxText);
+                }
+                $(deviceBoxId).val(value);
+            });
+
+
+            var serviceBoxId = '#node-input-service';
+            var serviceBoxText = '<input type="text" id="node-input-service" placeholder="all" style="width: 100%;">';
+            var serviceBoxSelect = '<select id="node-input-service" style="width: 100%;" />';
+
+            function lookupServices(sVal, dVal) {
+
+                var selectService = $('#node-input-service');               
+                var optGroup = $('<optgroup label="Services"></optgroup>');
+                selectService.append(optGroup);
+
+                var sList = dVal.split('|')[3].split(',');
+                selectService.append($('<option/>').val('all').text('all'));
+                sList.forEach(function(element) {
+                    selectService.append($('<option/>').val(element).text(element));
+                });
+            }
+
+            $('#node-input-lookup-service').click( function() {  
+                
+                var sVal = $(serviceBoxId).val();
+                var dVal = $(deviceBoxId).val();
+
+                if ($(serviceBoxId).attr('type') === 'text') {
+                    $(serviceBoxId).replaceWith(serviceBoxSelect);
+                    lookupServices(sVal, dVal);
+                } else {
+                    $(serviceBoxId).replaceWith(serviceBoxText);
+                }
+                $(serviceBoxId).val(sVal);
+            });
+
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="shc-device">
+
+    <div class="form-row">
+        <label for="node-input-shc"><i class="fa fa-server"></i> SHC</label>
+        <input type="text" id="node-input-shc">
+    </div>
+
+    <div class="form-row" style="white-space: nowrap;">
+        <label for="node-input-device"><i class="fa fa-power-off"></i> Device</label>
+        <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+          <div style="position: absolute; left: 0px; right: 40px;">
+            <input type="text" id="node-input-device" placeholder="No device specified" style="width: 100%;" />
+          </div>
+          <a id="node-input-lookup-device" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
+            <i class="fa fa-search"></i>
+          </a>
+        </div>
+    </div>
+
+    <div class="form-row" style="white-space: nowrap;">
+        <label for="node-input-service"><i class="fa fa-cog"></i> Service</label>
+        <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+          <div style="position: absolute; left: 0px; right: 40px;">
+            <input type="text" id="node-input-service" placeholder="No service specified" style="width: 100%;" />
+          </div>
+          <a id="node-input-lookup-service" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
+            <i class="fa fa-search"></i>
+          </a>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-state"><i class="fa fa-check-square"></i> State</label>
+        <input type="text" id="node-input-state" placeholder="State" />
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="shc-device">
+    <p></p>
+</script>

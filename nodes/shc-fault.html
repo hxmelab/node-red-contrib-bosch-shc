@@ -1,0 +1,52 @@
+<script type="text/javascript">
+    RED.nodes.registerType('shc-fault', {
+        category: 'BoschSmartHome',
+        color: '#0096ff',
+        outputs: 1,
+        defaults: {
+            'shc': {
+                value: '',
+                type: 'shc-config',
+                required: true
+            },
+            name: {
+                value: ''
+            },
+            debug: {
+                value: false
+            }
+        },
+        label: function() {
+            return this.name || 'shc faults';
+        },
+        paletteLabel: 'faults',
+        icon: 'debug.png'
+    });
+</script>
+
+<script type="text/x-red" data-template-name="shc-fault"> 
+    <div class="form-row">
+        <label for="node-input-shc"><i class="fa fa-server"></i> SHC</label>
+        <input type="text" id="node-input-shc">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-debug"><i class="fa fa-bug"></i> Debug</label>
+        <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+            <div style="position: absolute; left: 0px;">
+                <input type="checkbox" id="node-input-debug">
+            </div>
+            <div style="position: relative; left: 20px; top: 3px;">Receive all messages</div>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>  
+</script>
+
+<script type="text/x-red" data-help-name="shc-fault">
+    <p>Receive all fault messages from Bosch Smart Home Controller.</p>
+    <p>Activate Debug to receive all messages from Bosch Smart Home Controller.</p>
+</script>

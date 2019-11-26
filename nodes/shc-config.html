@@ -1,0 +1,163 @@
+<script type="text/javascript">
+    RED.nodes.registerType('shc-config',{
+        category: 'config',
+        defaults: {
+            shcip: {
+                value: '',
+                required: true
+            },
+            clientid: {
+                value: '',
+                required: true
+            },
+            clientname: {
+                value: 'Node-RED-Contrib-Bosch-SHC',
+                required: true
+            },
+            state: {
+                value: 'NOT PAIRED',
+                require: true
+            }
+        },
+        credentials: {
+            password: {
+                type: 'password'
+            }
+        },
+        label: function() {
+            return 'https://' + this.shcip;
+        },
+        oneditsave: function() {
+
+        },
+        oneditprepare: function () {
+
+            var clientidBoxId = '#node-config-input-clientid';
+            var shcipBoxId = '#node-config-input-shcip';
+            var shcipBoxText = '<input type="text" id="node-config-input-shcip" placeholder="192.168.0.10" style="width: 100%;">';
+            var shcipBoxSelect = '<select id="node-config-input-shcip" style="width: 100%;" />';
+            
+            if (!($('#node-config-input-clientid').val().length > 0)) {
+                $.getJSON('/shc/id', {})
+                    .done(function(data) {
+                        console.log(data);
+                        $('#node-config-input-clientid').val(data);
+                    })
+                    .fail(function(err) {
+                        RED.notify(err.responseText, "error");
+                    });
+            }        
+
+
+            $('#node-input-lookup-devices').click( function () {
+                var value = $(shcipBoxId).val();
+                if ($(shcipBoxId).attr('type') === 'text') {
+                    $(shcipBoxId).replaceWith(shcipBoxSelect);
+                    discoverShc(value);
+                } else {
+                    $(shcipBoxId).replaceWith(shcipBoxText);
+                    $(shcipBoxId).val(value);
+                }
+            });
+
+            function discoverShc(value) {
+                RED.notify('Searching SHCs in local network, please wait...', 'notice');
+                $.getJSON('/shc/discover', {})
+                .done(function(data) {
+                    console.log(data);
+                    populate(data);
+                    $(shcipBoxId).val(value);                    
+                })
+                .fail(function(err) {
+                    RED.notify(err.responseText, "error");
+                });
+            }
+
+            function populate(data) {
+                if (data.length > 0) {
+                    var optGroup = $('<optgroup label="SHC"></optgroup>');
+                    $(shcipBoxId).append(optGroup);
+                    data.reduce(function (parent, shc) {
+                        parent.append(format(shc));
+                        return parent;
+                    }, optGroup);
+                    RED.notify('Done, please select a SHC', 'notice');
+                } else {
+                    RED.notify('No SHC found in local network', 'notice');
+                }
+            }
+
+            function format(shc) {
+                return $('<option/>')
+                    .val(shc.address)
+                    .text('IP: ' + shc.address + ' Mac: ' + shc.fqdn.split('[').pop().split(']')[0]);
+            }
+
+            $('#node-input-pair-shc').click( function() {
+                var shcip   = $('#node-config-input-shcip').val();
+                var clientid = $('#node-config-input-clientid').val();
+                var clientname = $('#node-config-input-clientname').val();
+                var password   = $('#node-config-input-password').val();
+                
+                var state  = $('#node-config-input-state').val();
+                if (state === 'PAIRED') {
+                    RED.notify('Client already paired', 'notice');
+                } else {
+                    $.getJSON('/shc/client', { 'shcip': shcip, 'clientid': clientid, 
+                        'clientname': clientname, 'password': password})
+                    .done(function(data) {
+                        console.log(data);
+                        $('#node-config-input-state').val(data);
+                    })
+                    .fail(function(err) {
+                        $('#node-config-input-state').val(err.responseText);
+                        RED.notify(err.responseText, "error");
+                    });
+                }
+            });
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="shc-config">
+    <h3>Bosch Smart Home Controller</h3>
+    <div class="form-row" style="white-space: nowrap;">
+        <label for="node-config-input-shcip"><i class="fa fa-server"></i> Ip</label>
+        <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+            <div style="position: absolute; left: 0px; right: 40px;">
+                <input type="text" id="node-config-input-shcip" placeholder="192.168.0.10" style="width: 100%;">
+            </div>
+            <a id="node-input-lookup-devices" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
+            <i class="fa fa-search"></i></a>
+        </div>
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-password"><i class="fa fa-key"></i> Password</label>
+        <input type="password" id="node-config-input-password">
+    </div>
+
+    <h3>Client Configuration</h3>
+    <div class="form-tips"><b>Hint:</b> Please use the Bosch Smart Home App to delete a client.</div>
+    <div class="form-row">
+        <label for="node-config-input-clientid"><i class="fa fa-user"></i> Id</label>
+        <input type="text" id="node-config-input-clientid">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-clientname"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-config-input-clientname">
+    </div>
+
+    <h3>Pairing</h3>
+    <div class="form-tips"><b>Hint:</b> Please, first press button on SHC until LEDs flashes before pairing. 
+    </div>
+    <div class="form-row" style="white-space: nowrap;">
+        <label for="node-config-input-state"><i class="fa fa-handshake-o"></i> State</label>
+        <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+            <div style="position: absolute; left: 0px; right: 40px;">
+                <input type="text" id="node-config-input-state" style="width: 100%;">
+            </div>
+            <a id="node-input-pair-shc" title="Register User" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
+            Pair</a>
+        </div>
+    </div>
+</script>
