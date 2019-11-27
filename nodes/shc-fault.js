@@ -9,16 +9,6 @@ module.exports = function (RED) {
             this.name = config.name;
             this.debug = config.debug;
 
-            this.on('close', function (removed, done) {
-                if (removed) {
-                    this.log('SHC fault node removed');
-                } else {
-                    this.log('SHC fault node restarted');
-                }
-
-                done();
-            });
-
             /**
              * Check configuration state
              */

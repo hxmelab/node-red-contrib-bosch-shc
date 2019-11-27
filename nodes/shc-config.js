@@ -37,10 +37,8 @@ module.exports = function (RED) {
         }
 
         async destructor(done) {
-            if (this.pollid.length > 0) {
-                await this.unsubscribe();
-                done();
-            }
+            await this.unsubscribe();
+            done();
         }
 
         subscribe() {
@@ -73,14 +71,14 @@ module.exports = function (RED) {
 
         unsubscribe() {
             return new Promise((resolve, reject) => {
-                if (this.pollid.length > 0) {
-                    this.shc.getBshcClient().unsubscribe('', this.pollid).subscribe(() => {
+                if (this.state === 'PAIRED' && this.pollid.length > 0) {
+                    this.shc.getBshcClient().unsubscribe('', this.pollid).subscribe(complete => {
                         this.log('Unsubscribe SHC: ' + this.shcip + ' with poll Id: ' + this.pollid);
                         this.pollid = '';
                         resolve();
-                    }, err => {
-                        reject(err);
                     });
+                } else {
+                    resolve();
                 }
             });
         }
