@@ -20,7 +20,7 @@ module.exports = function (RED) {
             this.state = config.state;
             this.password = this.credentials.password;
 
-            this.pollid = '';
+            this.pollid = null;
             this.on('close', this.destructor);
 
             this.certDir = path.join(RED.settings.userDir, 'certs');
@@ -54,7 +54,7 @@ module.exports = function (RED) {
         }
 
         poll() {
-            if (this.pollid.length > 0) {
+            if (this.pollid) {
                 this.shc.getBshcClient().longPolling('', this.pollid).subscribe(data => {
                     if (data.result) {
                         this.emit('shc-events', data.result);
@@ -71,10 +71,10 @@ module.exports = function (RED) {
 
         unsubscribe() {
             return new Promise((resolve, reject) => {
-                if (this.state === 'PAIRED' && this.pollid.length > 0) {
+                if (this.state === 'PAIRED' && this.pollid) {
                     this.shc.getBshcClient().unsubscribe('', this.pollid).subscribe(complete => {
                         this.log('Unsubscribe SHC: ' + this.shcip + ' with poll Id: ' + this.pollid);
-                        this.pollid = '';
+                        this.pollid = null;
                         resolve();
                     });
                 } else {
