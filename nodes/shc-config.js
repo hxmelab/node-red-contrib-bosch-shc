@@ -124,7 +124,7 @@ module.exports = function (RED) {
         const cert = path.join(RED.settings.userDir, 'certs');
         const shc = new BoschSmartHomeBridge(req.query.shcip, req.query.clientid, cert, new ShcLogger());
 
-        shc.pairIfNeeded(req.query.clientname, req.query.password, 0, 10).subscribe(res => {
+        shc.pairIfNeeded(req.query.clientname, req.query.password, 0, 1).subscribe(res => {
             if (res && res.token) {
                 result.set({'content-type': 'application/json; charset=utf-8'});
                 result.end('PAIRED');
@@ -133,7 +133,7 @@ module.exports = function (RED) {
                 result.end('ERROR - Wrong Password?');
             }
         }, err => {
-            this.error(err);
+            //this.error(err);
             result.set({'content-type': 'application/json; charset=utf-8'});
             result.end('ERROR - Button pressed?');
         });
