@@ -1,7 +1,6 @@
-"use strict";
+'use strict';
 
-module.exports = function(RED) {
-
+module.exports = function (RED) {
     class SHCDeviceNode {
         constructor(config) {
             RED.nodes.createNode(this, config);
@@ -15,9 +14,9 @@ module.exports = function(RED) {
             this.shcConfig = RED.nodes.getNode(config.shc);
 
             /**
-             * 
+             *
              */
-            this.on('input', function(msg, send, done) {
+            this.on('input', function (msg, send, done) {
                 if (this.shcConfig && this.shcConfig.state === 'PAIRED') {
                     if (this.isValid(msg.payload) && this.getServiceBody(msg.payload)) {
                         this.shcConfig.shc.getBshcClient().putState(this.getPath(), this.getServiceBody(msg.payload)).subscribe(result => {
@@ -35,40 +34,41 @@ module.exports = function(RED) {
                         });
                     }
                 }
-            });        
-            
+            });
+
             /**
              * Check configuration state
              */
             if (this.shcConfig) {
-                if (this.shcConfig.state !== 'PAIRED') {
-                    this.status({fill: 'blue', shape:'ring', text:'Add Client'});
+                if (this.shcConfig.state === 'PAIRED') {
+                    this.status({fill: 'green', shape: 'dot', text: 'node-red:common.status.connected'});
                 } else {
-                    this.status({fill: 'green', shape:'dot', text:'node-red:common.status.connected'});                
-                } 
+                    this.status({fill: 'blue', shape: 'ring', text: 'Add Client'});
+                }
             } else {
-                this.status({fill: 'blue', shape:'ring', text:'Add Configuration'});
+                this.status({fill: 'blue', shape: 'ring', text: 'Add Configuration'});
             }
 
             this.registerListener();
-
         }
 
         setMsgObject(res, msg) {
-            if (res.length) {
+            if (Array.isArray(res)) {
                 msg.topic = 'serviceArray';
                 msg.payload = res;
             } else {
                 if (res.state) {
                     msg.topic = res.state['@type'];
                 }
+
                 if (this.state.length > 0) {
                     msg.payload = res.state[this.state];
                 } else {
                     msg.payload = res;
                 }
             }
-            return(msg);
+
+            return (msg);
         }
 
         isRelevant(msg) {
@@ -79,7 +79,7 @@ module.exports = function(RED) {
         }
 
         isValid(newState) {
-            switch(this.deviceModel) {
+            switch (this.deviceModel) {
                 case 'SD':
                 case 'BSM':
                 case 'PSM':
@@ -88,7 +88,7 @@ module.exports = function(RED) {
                 case 'TWINGUARD':
                 case 'INTRUSION_DETECTION_SYSTEM':
                 case 'PRESENCE_SIMULATION_SERVICE': return (typeof newState === 'boolean');
-                case 'BBL': return (typeof newState === 'number' && newState >= 0.00 && newState <= 1.00);
+                case 'BBL': return (typeof newState === 'number' && newState >= 0 && newState <= 1);
                 case 'ROOM_CLIMATE_CONTROL': return (typeof newState === 'number' && newState > 4 && newState < 31);
                 default: return false;
             }
@@ -99,39 +99,38 @@ module.exports = function(RED) {
         }
 
         getServiceBody(newState) {
-            switch(this.serviceId) {
-                case 'SmokeDetectorCheck': return {'@type': 'smokeDetectorCheckState', 'value': 'SMOKE_TEST_REQUESTED'};
-                case 'PowerSwitch': return {'@type': 'powerSwitchState', 'switchState': (newState ? 'ON' : 'OFF')};
-                case 'RoomClimateControl': return {'@type': 'climateControlState', 'setpointTemperature': newState};
-                case 'PrivacyMode': return {'@type': 'privacyModeState', 'value': (newState ? 'ENABLED':'DISABLED')};
-                case 'IntrusionDetectionControl': return {'@type': 'intrusionDetectionControlState', 'value': ( newState ? 'SYSTEM_ARMED':'SYSTEM_DISARMED' )};
-                case 'PresenceSimulationConfiguration': return {'@type': 'presenceSimulationConfigurationState', 'enabled': newState};
-                case 'ShutterControl': return {'@type': 'shutterControlState', 'level': newState};
+            switch (this.serviceId) {
+                case 'SmokeDetectorCheck': return {'@type': 'smokeDetectorCheckState', value: 'SMOKE_TEST_REQUESTED'};
+                case 'PowerSwitch': return {'@type': 'powerSwitchState', switchState: (newState ? 'ON' : 'OFF')};
+                case 'RoomClimateControl': return {'@type': 'climateControlState', setpointTemperature: newState};
+                case 'PrivacyMode': return {'@type': 'privacyModeState', value: (newState ? 'ENABLED' : 'DISABLED')};
+                case 'IntrusionDetectionControl': return {'@type': 'intrusionDetectionControlState', value: (newState ? 'SYSTEM_ARMED' : 'SYSTEM_DISARMED')};
+                case 'PresenceSimulationConfiguration': return {'@type': 'presenceSimulationConfigurationState', enabled: newState};
+                case 'ShutterControl': return {'@type': 'shutterControlState', level: newState};
                 default: return false;
-            }
-        }
-
-        shcEventsHandler = (data) => {
-            if (data.error) {
-                this.status({fill: 'red', shape:'ring', text:'node-red:common.status.disconnected'});
-            } else {
-                this.status({fill: 'green', shape:'dot', text:'node-red:common.status.connected'});
-                let parsed = JSON.parse(JSON.stringify(data));
-                parsed.forEach(msg => {
-                    if (this.isRelevant(msg)) {
-                        this.send(this.setMsgObject(msg, msg));
-                    }
-                });
             }
         }
 
         registerListener() {
             if (this.shcConfig && this.shcConfig.state === 'PAIRED') {
-                this.shcConfig.addListener("shc-events", this.shcEventsHandler);
+                this.listener = data => {
+                    if (data.error) {
+                        this.status({fill: 'red', shape: 'ring', text: 'node-red:common.status.disconnected'});
+                    } else {
+                        this.status({fill: 'green', shape: 'dot', text: 'node-red:common.status.connected'});
+                        const parsed = JSON.parse(JSON.stringify(data));
+                        parsed.forEach(msg => {
+                            if (this.isRelevant(msg)) {
+                                this.send(this.setMsgObject(msg, msg));
+                            }
+                        });
+                    }
+                };
+
+                this.shcConfig.addListener('shc-events', this.listener);
             }
         }
-
     }
 
-    RED.nodes.registerType("shc-device", SHCDeviceNode);
-}
+    RED.nodes.registerType('shc-device', SHCDeviceNode);
+};

@@ -3,7 +3,7 @@
         category: 'BoschSmartHome',
         color: '#0096ff',
         defaults: {
-            'shc': {
+            shc: {
                 value: '',
                 type: 'shc-config',
                 required: true
@@ -25,54 +25,55 @@
         },
         inputs: 1,
         outputs: 1,
-        icon: "bosch-smarthome-icon.png",
-        label: function() {
-            return this.name || "shc device";
+        icon: 'bosch-smarthome-icon.png',
+        label() {
+            return this.name || 'shc device';
         },
         paletteLabel: 'device',
-        oneditprepare: function () {
-            var deviceBoxId = '#node-input-device';
-            var deviceBoxText = '<input type="text" id="node-input-device" placeholder="Select a device" style="width: 100%;">';
-            var deviceBoxSelect = '<select id="node-input-device" style="width: 100%;" />';
+        oneditprepare() {
+            const deviceBoxId = '#node-input-device';
+            const deviceBoxText = '<input type="text" id="node-input-device" placeholder="Select a device" style="width: 100%;">';
+            const deviceBoxSelect = '<select id="node-input-device" style="width: 100%;" />';
 
-            function lookupDevices(value) {
-                var shcConfig = RED.nodes.node($('#node-input-shc').val());
-                var selectDevice = $('#node-input-device');
+            function lookupDevices() {
+                const shcConfig = RED.nodes.node($('#node-input-shc').val());
+                const selectDevice = $('#node-input-device');
 
                 function format(device) {
-                    var services = '';
-                    for (var i = 0; i < device.deviceServiceIds.length; i++) {
+                    let services = '';
+                    for (let i = 0; i < device.deviceServiceIds.length; i++) {
                         if (i === 0) {
                             services = device.deviceServiceIds[i];
                         } else {
                             services = services + ',' + device.deviceServiceIds[i];
                         }
                     }
+
                     return $('<option/>')
                         .val(device.name + '|' + device.id + '|' + device.deviceModel + '|' + services)
                         .text(device.name);
                 }
 
                 function getRoomName(roomId, rooms) {
-                    var roomName = 'No room defined';
-                    rooms.forEach(function (element) {
+                    let roomName = 'No room defined';
+                    rooms.forEach(element => {
                         if (element.id === roomId) {
                             roomName = element.name;
                         }
                     }, this);
                     return roomName;
                 }
-            
+    
                 function isSupported(model) {
-                    const supportedDevices = "CAMERA_360, CAMERA_EYES, BBL, BSM, " +
-                                "INTRUSION_DETECTION_SYSTEM, MD, PSM, PRESENCE_SIMULATION_SERVICE, " + 
-                                "ROOM_CLIMATE_CONTROL, SD, SWD, TWINGUARD, WRC2";
-                    return (supportedDevices.indexOf(model) !== -1);
+                    const supportedDevices = 'CAMERA_360, CAMERA_EYES, BBL, BSM, ' +
+                            'INTRUSION_DETECTION_SYSTEM, MD, PSM, PRESENCE_SIMULATION_SERVICE, ' +
+                            'ROOM_CLIMATE_CONTROL, SD, SWD, TWINGUARD, WRC2';
+                    return (supportedDevices.includes(model));
                 }
 
                 function filterDevices(roomId, devices) {
-                    var filterList = [];
-                    devices.forEach(function (element) {
+                    const filterList = [];
+                    devices.forEach(element => {
                         if (isSupported(element.deviceModel) && element.roomId === roomId) {
                             filterList.push(element);
                         }
@@ -81,9 +82,9 @@
                 }
 
                 function filterUndefinedRoom(devices) {
-                    var filterList = [];
-                    devices.forEach(function (element) {
-                        if (isSupported(element.deviceModel) && typeof element.roomId == 'undefined') {
+                    const filterList = [];
+                    devices.forEach(element => {
+                        if (isSupported(element.deviceModel) && typeof element.roomId === 'undefined') {
                             filterList.push(element);
                         }
                     }, this);
@@ -92,22 +93,23 @@
 
                 function populate(rooms, devices) {
                     if (devices.length > 0 && rooms.length > 0) {
-                        var serviceList = filterUndefinedRoom(devices);
+                        const serviceList = filterUndefinedRoom(devices);
                         if (serviceList.length > 0) {
-                            var serviceGroup = $('<optgroup label="Without Room"></optgroup>');
+                            const serviceGroup = $('<optgroup label="Without Room"></optgroup>');
                             selectDevice.append(serviceGroup);
-                            serviceList.reduce(function (parent, service) {
+                            serviceList.reduce((parent, service) => {
                                 parent.append(format(service));
                                 return parent;
                             }, serviceGroup);
                         }
-                        rooms.forEach(function (element) {
-                            var roomName = getRoomName(element.id, rooms);
-                            var deviceList = filterDevices(element.id, devices);
 
-                            var optGroup = $('<optgroup label="' + roomName + '"></optgroup>');
+                        rooms.forEach(element => {
+                            const roomName = getRoomName(element.id, rooms);
+                            const deviceList = filterDevices(element.id, devices);
+
+                            const optGroup = $('<optgroup label="' + roomName + '"></optgroup>');
                             selectDevice.append(optGroup);
-                            deviceList.reduce(function (parent, device) {
+                            deviceList.reduce((parent, device) => {
                                 parent.append(format(device));
                                 return parent;
                             }, optGroup);
@@ -118,67 +120,63 @@
                         RED.notify('No device found', 'notice');
                     }
                 }
+
                 if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {
                     RED.notify('Fetching data, please wait...', 'notice');
-                    $.getJSON('/shc/devices', {'shcip': shcConfig.shcip, 'clientid': shcConfig.clientid})
-                        .done(function (devices) {
-                            $.getJSON('/shc/rooms', {'shcip': shcConfig.shcip, 'clientid': shcConfig.clientid})
-                                .done(function (rooms) {
+                    $.getJSON('/shc/devices', {shcip: shcConfig.shcip, clientid: shcConfig.clientid})
+                        .done(devices => {
+                            $.getJSON('/shc/rooms', {shcip: shcConfig.shcip, clientid: shcConfig.clientid})
+                                .done(rooms => {
                                     populate(rooms, devices);
                                     console.log(rooms);
                                 })
-                                .fail(function (err) {
-                                    RED.notify(err.responseText, "error");
+                                .fail(err => {
+                                    RED.notify(err.responseText, 'error');
                                 });
                             console.log(devices);
                         })
-                        .fail(function (err) {
-                            RED.notify(err.responseText, "error");
+                        .fail(err => {
+                            RED.notify(err.responseText, 'error');
                         });
+                } else if (shcConfig) {
+                    RED.notify('Client not added to SHC', 'notice');
                 } else {
-                    if (shcConfig) {
-                        RED.notify('Client not added to SHC', 'notice');
-                    } else {
-                        RED.notify('Select a controller or create one', 'notice');
-                    }
+                    RED.notify('Select a controller or create one', 'notice');
                 }
             }
 
-            $('#node-input-lookup-device').click( function() {  
-                
-                var value = $(deviceBoxId).val();
+            $('#node-input-lookup-device').click(() => {
+                const value = $(deviceBoxId).val();
 
                 if ($(deviceBoxId).attr('type') === 'text') {
                     $(deviceBoxId).replaceWith(deviceBoxSelect);
-                    lookupDevices(value);
+                    lookupDevices();
                 } else {
                     $(deviceBoxId).replaceWith(deviceBoxText);
                 }
+
                 $(deviceBoxId).val(value);
             });
 
-
-            var serviceBoxId = '#node-input-service';
-            var serviceBoxText = '<input type="text" id="node-input-service" placeholder="all" style="width: 100%;">';
-            var serviceBoxSelect = '<select id="node-input-service" style="width: 100%;" />';
+            const serviceBoxId = '#node-input-service';
+            const serviceBoxText = '<input type="text" id="node-input-service" placeholder="all" style="width: 100%;">';
+            const serviceBoxSelect = '<select id="node-input-service" style="width: 100%;" />';
 
             function lookupServices(sVal, dVal) {
-
-                var selectService = $('#node-input-service');               
-                var optGroup = $('<optgroup label="Services"></optgroup>');
+                const selectService = $('#node-input-service');
+                const optGroup = $('<optgroup label="Services"></optgroup>');
                 selectService.append(optGroup);
 
-                var sList = dVal.split('|')[3].split(',');
+                const sList = dVal.split('|')[3].split(',');
                 selectService.append($('<option/>').val('all').text('all'));
-                sList.forEach(function(element) {
+                sList.forEach(element => {
                     selectService.append($('<option/>').val(element).text(element));
                 });
             }
 
-            $('#node-input-lookup-service').click( function() {  
-                
-                var sVal = $(serviceBoxId).val();
-                var dVal = $(deviceBoxId).val();
+            $('#node-input-lookup-service').click(() => {
+                const sVal = $(serviceBoxId).val();
+                const dVal = $(deviceBoxId).val();
 
                 if ($(serviceBoxId).attr('type') === 'text') {
                     $(serviceBoxId).replaceWith(serviceBoxSelect);
@@ -186,9 +184,9 @@
                 } else {
                     $(serviceBoxId).replaceWith(serviceBoxText);
                 }
+
                 $(serviceBoxId).val(sVal);
             });
-
         }
     });
 </script>
