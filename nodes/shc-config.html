@@ -88,6 +88,7 @@
             }
 
             $('#node-input-pair-shc').click(() => {
+                RED.notify('POST New Client', 'notice');
                 const shcip = $('#node-config-input-shcip').val();
                 const clientid = $('#node-config-input-clientid').val();
                 const clientname = $('#node-config-input-clientname').val();
@@ -100,12 +101,12 @@
                     $.getJSON('/shc/client', {shcip, clientid,
                         clientname, password})
                         .done(data => {
-                            console.log(data);
+                            RED.notify('Success', 'notice');
                             $('#node-config-input-state').val(data);
                         })
                         .fail(err => {
+                            RED.notify(err.responseText, 'notice');
                             $('#node-config-input-state').val(err.responseText);
-                            RED.notify(err.responseText, 'error');
                         });
                 }
             });

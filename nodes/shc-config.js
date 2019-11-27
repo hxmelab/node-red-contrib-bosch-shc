@@ -20,7 +20,7 @@ module.exports = function (RED) {
             this.state = config.state;
             this.password = this.credentials.password;
 
-            this.pollid = '';
+            this.pollid = null;
             this.on('close', this.destructor);
 
             this.certDir = path.join(RED.settings.userDir, 'certs');
@@ -37,10 +37,8 @@ module.exports = function (RED) {
         }
 
         async destructor(done) {
-            if (this.pollid.length > 0) {
-                await this.unsubscribe();
-                done();
-            }
+            await this.unsubscribe();
+            done();
         }
 
         subscribe() {
@@ -56,7 +54,7 @@ module.exports = function (RED) {
         }
 
         poll() {
-            if (this.pollid.length > 0) {
+            if (this.pollid) {
                 this.shc.getBshcClient().longPolling('', this.pollid).subscribe(data => {
                     if (data.result) {
                         this.emit('shc-events', data.result);
@@ -73,14 +71,14 @@ module.exports = function (RED) {
 
         unsubscribe() {
             return new Promise((resolve, reject) => {
-                if (this.pollid.length > 0) {
-                    this.shc.getBshcClient().unsubscribe('', this.pollid).subscribe(() => {
+                if (this.state === 'PAIRED' && this.pollid) {
+                    this.shc.getBshcClient().unsubscribe('', this.pollid).subscribe(complete => {
                         this.log('Unsubscribe SHC: ' + this.shcip + ' with poll Id: ' + this.pollid);
-                        this.pollid = '';
+                        this.pollid = null;
                         resolve();
-                    }, err => {
-                        reject(err);
                     });
+                } else {
+                    resolve();
                 }
             });
         }
@@ -124,7 +122,7 @@ module.exports = function (RED) {
         const cert = path.join(RED.settings.userDir, 'certs');
         const shc = new BoschSmartHomeBridge(req.query.shcip, req.query.clientid, cert, new ShcLogger());
 
-        shc.pairIfNeeded(req.query.clientname, req.query.password, 0, 10).subscribe(res => {
+        shc.pairIfNeeded(req.query.clientname, req.query.password, 0, 1).subscribe(res => {
             if (res && res.token) {
                 result.set({'content-type': 'application/json; charset=utf-8'});
                 result.end('PAIRED');
@@ -133,7 +131,7 @@ module.exports = function (RED) {
                 result.end('ERROR - Wrong Password?');
             }
         }, err => {
-            this.error(err);
+            //this.error(err);
             result.set({'content-type': 'application/json; charset=utf-8'});
             result.end('ERROR - Button pressed?');
         });
