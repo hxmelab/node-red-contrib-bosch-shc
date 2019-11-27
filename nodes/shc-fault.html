@@ -4,7 +4,7 @@
         color: '#0096ff',
         outputs: 1,
         defaults: {
-            'shc': {
+            shc: {
                 value: '',
                 type: 'shc-config',
                 required: true
@@ -16,7 +16,7 @@
                 value: false
             }
         },
-        label: function() {
+        label() {
             return this.name || 'shc faults';
         },
         paletteLabel: 'faults',

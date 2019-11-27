@@ -1,9 +1,9 @@
 <script type="text/javascript">
-    RED.nodes.registerType('shc-scenario',{
+    RED.nodes.registerType('shc-scenario', {
         category: 'BoschSmartHome',
         color: '#0096ff',
         defaults: {
-            'shc': {
+            shc: {
                 value: '',
                 type: 'shc-config',
                 required: true
@@ -18,63 +18,60 @@
         },
         inputs: 1,
         outputs: 0,
-        icon: "inject.png",
-        label: function() {
-            return this.name || "shc scenario";
+        icon: 'inject.png',
+        label() {
+            return this.name || 'shc scenario';
         },
         paletteLabel: 'scenario',
-        oneditprepare: function () {
-            var scenarioBoxId     = '#node-input-scenario';
-            var scenarioBoxText   = '<input type="text" id="node-input-scenario" style="width: 100%;">';            
-            var scenarioBoxSelect = '<select id="node-input-scenario" style="width: 100%;" />';
-                
+        oneditprepare() {
+            const scenarioBoxId = '#node-input-scenario';
+            const scenarioBoxText = '<input type="text" id="node-input-scenario" style="width: 100%;">';
+            const scenarioBoxSelect = '<select id="node-input-scenario" style="width: 100%;" />';
+    
             function lookupScenarios(value) {
-                var shcConfig = RED.nodes.node($('#node-input-shc').val());
-                var selectScenario = $('#node-input-scenario');       
+                const shcConfig = RED.nodes.node($('#node-input-shc').val());
+                const selectScenario = $('#node-input-scenario');
 
                 function format(scenario) {
                     return $('<option/>')
-                            .val(scenario.name + '|' + scenario.id)
-                            .text(scenario.name);
+                        .val(scenario.name + '|' + scenario.id)
+                        .text(scenario.name);
                 }
-                
+    
                 function populate(scenarios) {
-                    if (scenarios.length > 0) {                    
-                        var optGroup = $('<optgroup label="Scenarios"></optgroup>');
-                            selectScenario.append(optGroup);
-                            scenarios.reduce(function(parent, scenario) {
-                                parent.append(format(scenario));
-                                return parent;
-                            }, optGroup);
+                    if (scenarios.length > 0) {
+                        const optGroup = $('<optgroup label="Scenarios"></optgroup>');
+                        selectScenario.append(optGroup);
+                        scenarios.reduce((parent, scenario) => {
+                            parent.append(format(scenario));
+                            return parent;
+                        }, optGroup);
                         RED.notify('Got it, please select a scenario', 'notice');
                     } else {
                         RED.notify('No scenario found', 'notice');
                     }
                 }
 
-                if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {                
+                if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {
                     RED.notify('Fetching data, please wait...', 'notice');
-                    $.getJSON('/shc/scenarios', {'shcip': shcConfig.shcip, 'clientid': shcConfig.clientid})
-                        .done(function(scenarios) {
-                            populate(scenarios);  
-                            $(scenarioBoxId).val(value); 
-                            console.log(scenarios);                     
+                    $.getJSON('/shc/scenarios', {shcip: shcConfig.shcip, clientid: shcConfig.clientid})
+                        .done(scenarios => {
+                            populate(scenarios);
+                            $(scenarioBoxId).val(value);
+                            console.log(scenarios);
                         })
-                        .fail(function(err) {
-                            RED.notify(err.responseText, "error");
+                        .fail(err => {
+                            RED.notify(err.responseText, 'error');
                         });
+                } else if (shcConfig) {
+                    RED.notify('Client not added to SHC', 'notice');
                 } else {
-                    if (shcConfig) {
-                        RED.notify('Client not added to SHC', 'notice');
-                    } else {
-                        RED.notify('Select SHC or create configuration', 'notice');
-                    }
+                    RED.notify('Select SHC or create configuration', 'notice');
                 }
             }
 
-            $('#node-input-lookup-scenario').click( function() {  
-                
-                var value = $(scenarioBoxId).val();
+            $('#node-input-lookup-scenario').click(() => {
+                const value = $(scenarioBoxId).val();
 
                 if ($(scenarioBoxId).attr('type') === 'text') {
                     $(scenarioBoxId).replaceWith(scenarioBoxSelect);
