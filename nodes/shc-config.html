@@ -105,7 +105,7 @@
                             $('#node-config-input-state').val(data);
                         })
                         .fail(err => {
-                            RED.notify(err.responseText, 'error');
+                            RED.notify(err.responseText, 'notice');
                             $('#node-config-input-state').val(err.responseText);
                         });
                 }
