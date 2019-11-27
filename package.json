@@ -2,6 +2,8 @@
   "name": "node-red-contrib-bosch-shc",
   "version": "0.0.1",
   "description": "Bosch Smart Home Controller on Node-RED",
+  "repository": "https://github.com/hxmelab/node-red-contrib-bosch-shc",
+  "main": "none",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,9 +22,9 @@
   "node-red": {
     "nodes": {
       "shc-config": "nodes/shc-config.js",
-      "shc-fault": "nodes/shc-fault.js",
+      "shc-device": "nodes/shc-device.js",
       "shc-scenario": "nodes/shc-scenario.js",
-      "shc-device": "nodes/shc-device.js"
+      "shc-fault": "nodes/shc-fault.js"
     }
   },
   "dependencies": {
