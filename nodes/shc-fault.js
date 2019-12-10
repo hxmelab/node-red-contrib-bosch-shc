@@ -25,26 +25,29 @@ module.exports = function (RED) {
             this.registerListener();
         }
 
+        listener(data) {
+            if (data.error) {
+                this.status({fill: 'red', shape: 'ring', text: 'node-red:common.status.disconnected'});
+            } else {
+                this.status({fill: 'green', shape: 'dot', text: 'node-red:common.status.connected'});
+                const parsed = JSON.parse(JSON.stringify(data));
+                parsed.forEach(msg => {
+                    if (this.debug || msg.faults) {
+                        this.send({topic: 'shc-event', payload: msg});
+                    }
+                });
+            }
+        }
+
         registerListener() {
             if (this.shcConfig && this.shcConfig.state === 'PAIRED') {
-                this.listener = events => {
-                    if (events.error) {
-                        this.status({fill: 'red', shape: 'ring', text: 'node-red:common.status.disconnected'});
-                    } else {
-                        this.status({fill: 'green', shape: 'dot', text: 'node-red:common.status.connected'});
-                        const parsed = JSON.parse(JSON.stringify(events));
-                        parsed.forEach(msg => {
-                            if (this.debug || msg.faults) {
-                                this.send({topic: 'shc-event', payload: msg});
-                            }
-                        });
-                    }
-                };
-
-                this.shcConfig.addListener('shc-events', this.listener);
+                this.shcConfig.addListener('shc-events', data => {
+                    this.listener(data);
+                });
             }
         }
     }
+
     RED.nodes.registerType('shc-fault', ShcFaultNode);
 };
 

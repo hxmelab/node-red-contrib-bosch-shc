@@ -12,7 +12,7 @@ module.exports = function (RED) {
             /**
              * Triggers on any input msg the configured scenario
              */
-            this.on('input', function (msg, send, done) {
+            this.on('input', (msg, send, done) => {
                 if (this.scenario && this.shcConfig && this.shcConfig.state === 'PAIRED') {
                     this.shcConfig.shc.getBshcClient().triggerScenario(this.scenario).subscribe(() => {
                         done();
