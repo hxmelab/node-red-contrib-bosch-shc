@@ -16,7 +16,7 @@ module.exports = function (RED) {
             /**
              *
              */
-            this.on('input', function (msg, send, done) {
+            this.on('input', (msg, send, done) => {
                 if (this.shcConfig && this.shcConfig.state === 'PAIRED') {
                     if (this.isValid(msg.payload) && this.getServiceBody(msg.payload)) {
                         this.shcConfig.shc.getBshcClient().putState(this.getPath(), this.getServiceBody(msg.payload)).subscribe(result => {
@@ -60,7 +60,6 @@ module.exports = function (RED) {
                 if (res.state) {
                     msg.topic = res.state['@type'];
                 }
-
                 if (this.state.length > 0) {
                     msg.payload = res.state[this.state];
                 } else {
@@ -71,6 +70,10 @@ module.exports = function (RED) {
             return (msg);
         }
 
+        getPath() {
+            return 'devices/' + this.deviceId + '/services/' + this.serviceId;
+        }
+
         isRelevant(msg) {
             return ((this.deviceId === '*' && this.serviceId === '*') ||
                     (this.deviceId === '*' && this.serviceId === msg.id) ||
@@ -79,23 +82,16 @@ module.exports = function (RED) {
         }
 
         isValid(newState) {
-            switch (this.deviceModel) {
-                case 'SD':
-                case 'BSM':
-                case 'PSM':
-                case 'CAMERA_EYES':
-                case 'CAMERA_360':
-                case 'TWINGUARD':
-                case 'INTRUSION_DETECTION_SYSTEM':
-                case 'PRESENCE_SIMULATION_SERVICE': return (typeof newState === 'boolean');
-                case 'BBL': return (typeof newState === 'number' && newState >= 0 && newState <= 1);
-                case 'ROOM_CLIMATE_CONTROL': return (typeof newState === 'number' && newState > 4 && newState < 31);
+            switch (this.serviceId) {
+                case 'SmokeDetectorCheck':
+                case 'PowerSwitch':
+                case 'PrivacyMode':
+                case 'IntrusionDetectionControl':
+                case 'PresenceSimulationConfiguration': return (typeof newState === 'boolean');
+                case 'ShutterControl': return (typeof newState === 'number' && newState >= 0 && newState <= 1);
+                case 'RoomClimateControl': return (typeof newState === 'number' && newState >= 5 && newState <= 30);
                 default: return false;
             }
-        }
-
-        getPath() {
-            return 'devices/' + this.deviceId + '/services/' + this.serviceId;
         }
 
         getServiceBody(newState) {
@@ -111,23 +107,25 @@ module.exports = function (RED) {
             }
         }
 
+        listener(data) {
+            if (data.error) {
+                this.status({fill: 'red', shape: 'ring', text: 'node-red:common.status.disconnected'});
+            } else {
+                this.status({fill: 'green', shape: 'dot', text: 'node-red:common.status.connected'});
+                const parsed = JSON.parse(JSON.stringify(data));
+                parsed.forEach(msg => {
+                    if (this.isRelevant(msg)) {
+                        this.send(this.setMsgObject(msg, msg));
+                    }
+                });
+            }
+        }
+
         registerListener() {
             if (this.shcConfig && this.shcConfig.state === 'PAIRED') {
-                this.listener = data => {
-                    if (data.error) {
-                        this.status({fill: 'red', shape: 'ring', text: 'node-red:common.status.disconnected'});
-                    } else {
-                        this.status({fill: 'green', shape: 'dot', text: 'node-red:common.status.connected'});
-                        const parsed = JSON.parse(JSON.stringify(data));
-                        parsed.forEach(msg => {
-                            if (this.isRelevant(msg)) {
-                                this.send(this.setMsgObject(msg, msg));
-                            }
-                        });
-                    }
-                };
-
-                this.shcConfig.addListener('shc-events', this.listener);
+                this.shcConfig.addListener('shc-events', data => {
+                    this.listener(data);
+                });
             }
         }
     }

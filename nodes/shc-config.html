@@ -35,7 +35,6 @@
             if (!($('#node-config-input-clientid').val().length > 0)) {
                 $.getJSON('/shc/id', {})
                     .done(data => {
-                        console.log(data);
                         $('#node-config-input-clientid').val(data);
                     })
                     .fail(err => {
