@@ -70,9 +70,9 @@ module.exports = function (RED) {
         }
 
         unsubscribe() {
-            return new Promise((resolve, reject) => {
+            return new Promise(resolve => {
                 if (this.state === 'PAIRED' && this.pollid) {
-                    this.shc.getBshcClient().unsubscribe('', this.pollid).subscribe(complete => {
+                    this.shc.getBshcClient().unsubscribe('', this.pollid).subscribe(() => {
                         this.log('Unsubscribe SHC: ' + this.shcip + ' with poll Id: ' + this.pollid);
                         this.pollid = null;
                         resolve();
@@ -131,7 +131,7 @@ module.exports = function (RED) {
                 result.end('ERROR - Wrong Password?');
             }
         }, err => {
-            //this.error(err);
+            console.log(err);
             result.set({'content-type': 'application/json; charset=utf-8'});
             result.end('ERROR - Button pressed?');
         });
