@@ -1,13 +1,13 @@
 {
   "name": "node-red-contrib-bosch-shc",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Bosch Smart Home Controller (SHC) nodes for Node-Red",
   "repository": "https://github.com/hxmelab/node-red-contrib-bosch-shc",
   "main": "none",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "lintfix": "xo --fix",
-    "lintonly": "xo"
+    "linter": "xo"
   },
   "keywords": [
     "node-red",

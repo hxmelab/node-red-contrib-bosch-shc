@@ -87,7 +87,7 @@ module.exports = function (RED) {
     /**
      * Webhook for generating an identifier
      */
-    RED.httpAdmin.get('/shc/id', (req, result) => {
+    RED.httpAdmin.get('/shc/id', RED.auth.needsPermission('shc.read'), (req, result) => {
         result.set({'content-type': 'application/json; charset=utf-8'});
         result.end(JSON.stringify('node-red-contrib-bosch-shc-' + ('0000000000' + Math.floor(Math.random() * 10000000000)).slice(-10)));
     });
@@ -95,7 +95,7 @@ module.exports = function (RED) {
     /**
      * Webhook for discovering SHCs in local network
      */
-    RED.httpAdmin.get('/shc/discover', (req, result) => {
+    RED.httpAdmin.get('/shc/discover', RED.auth.needsPermission('shc.read'), (req, result) => {
         function filter(res) {
             const filterList = [];
             res.forEach(element => {
@@ -118,7 +118,7 @@ module.exports = function (RED) {
     /**
      * Webhook to add a client
      */
-    RED.httpAdmin.get('/shc/client', (req, result) => {
+    RED.httpAdmin.get('/shc/client', RED.auth.needsPermission('shc.write'), (req, result) => {
         const cert = path.join(RED.settings.userDir, 'certs');
         const shc = new BoschSmartHomeBridge(req.query.shcip, req.query.clientid, cert, new ShcLogger());
 
@@ -140,7 +140,7 @@ module.exports = function (RED) {
     /**
      * Webhook to fetch scenario list
      */
-    RED.httpAdmin.get('/shc/scenarios', (req, result) => {
+    RED.httpAdmin.get('/shc/scenarios', RED.auth.needsPermission('shc.read'), (req, result) => {
         const cert = path.join(RED.settings.userDir, 'certs');
         const shc = new BoschSmartHomeBridge(req.query.shcip, req.query.clientid, cert, new ShcLogger());
 
@@ -159,7 +159,7 @@ module.exports = function (RED) {
     /**
      * Webhook to fetch room list
      */
-    RED.httpAdmin.get('/shc/rooms', (req, result) => {
+    RED.httpAdmin.get('/shc/rooms', RED.auth.needsPermission('shc.read'), (req, result) => {
         const cert = path.join(RED.settings.userDir, 'certs');
         const shc = new BoschSmartHomeBridge(req.query.shcip, req.query.clientid, cert, new ShcLogger());
 
@@ -178,7 +178,7 @@ module.exports = function (RED) {
     /**
      * Webhook to fetch device list
      */
-    RED.httpAdmin.get('/shc/devices', (req, result) => {
+    RED.httpAdmin.get('/shc/devices', RED.auth.needsPermission('shc.read'), (req, result) => {
         const cert = path.join(RED.settings.userDir, 'certs');
         const shc = new BoschSmartHomeBridge(req.query.shcip, req.query.clientid, cert, new ShcLogger());
 
@@ -197,7 +197,7 @@ module.exports = function (RED) {
     /**
      * Webhook to fetch device list
      */
-    RED.httpAdmin.get('/shc/services', (req, result) => {
+    RED.httpAdmin.get('/shc/services', RED.auth.needsPermission('shc.read'), (req, result) => {
         const cert = path.join(RED.settings.userDir, 'certs');
         const shc = new BoschSmartHomeBridge(req.query.shcip, req.query.clientid, cert, new ShcLogger());
 

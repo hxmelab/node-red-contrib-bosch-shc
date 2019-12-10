@@ -60,6 +60,7 @@ module.exports = function (RED) {
                 if (res.state) {
                     msg.topic = res.state['@type'];
                 }
+
                 if (this.state.length > 0) {
                     msg.payload = res.state[this.state];
                 } else {

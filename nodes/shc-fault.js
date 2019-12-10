@@ -32,8 +32,8 @@ module.exports = function (RED) {
                 this.status({fill: 'green', shape: 'dot', text: 'node-red:common.status.connected'});
                 const parsed = JSON.parse(JSON.stringify(data));
                 parsed.forEach(msg => {
-                    if (this.isRelevant(msg)) {
-                        this.send(this.setMsgObject(msg, msg));
+                    if (this.debug || msg.faults) {
+                        this.send({topic: 'shc-event', payload: msg});
                     }
                 });
             }
@@ -47,7 +47,7 @@ module.exports = function (RED) {
             }
         }
     }
-    
+
     RED.nodes.registerType('shc-fault', ShcFaultNode);
 };
 
