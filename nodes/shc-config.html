@@ -22,6 +22,12 @@
         credentials: {
             password: {
                 type: 'password'
+            },
+            cert: {
+                type: 'password'
+            },
+            private: {
+                type: 'password'
             }
         },
         label() {
@@ -32,7 +38,18 @@
             const shcipBoxText = '<input type="text" id="node-config-input-shcip" placeholder="192.168.0.10" style="width: 100%;">';
             const shcipBoxSelect = '<select id="node-config-input-shcip" style="width: 100%;" />';
 
-            if (!($('#node-config-input-clientid').val().length > 0)) {
+            if (!this.credentials.has_cert) {
+                RED.notify('Generating new client data. Please wait...');
+                $.get('/shc/tls', {})
+                    .done(data => {
+                        RED.notify('Generated!');
+                        $('#node-config-input-private').val(data.split('|')[0]);
+                        $('#node-config-input-cert').val(data.split('|')[1]);
+                    })
+                    .fail(err => {
+                        RED.notify(err.responseText, 'error');
+                    });
+
                 $.getJSON('/shc/id', {})
                     .done(data => {
                         $('#node-config-input-clientid').val(data);
@@ -87,26 +104,38 @@
             }
 
             $('#node-input-pair-shc').click(() => {
-                RED.notify('POST New Client', 'notice');
                 const shcip = $('#node-config-input-shcip').val();
                 const clientid = $('#node-config-input-clientid').val();
                 const clientname = $('#node-config-input-clientname').val();
                 const password = $('#node-config-input-password').val();
-
+                const key = $('#node-config-input-private').val();
+                const cert = $('#node-config-input-cert').val();
                 const state = $('#node-config-input-state').val();
-                if (state === 'PAIRED') {
-                    RED.notify('Client already paired', 'notice');
+
+                if (shcip.trim().length === 0 ||
+                    clientid.trim().length === 0 ||
+                    clientname.trim().length === 0) {
+                    RED.notify('Some information are missing', 'error');
                 } else {
-                    $.getJSON('/shc/client', {shcip, clientid,
-                        clientname, password})
-                        .done(data => {
-                            RED.notify('Success', 'notice');
-                            $('#node-config-input-state').val(data);
-                        })
-                        .fail(err => {
-                            RED.notify(err.responseText, 'notice');
-                            $('#node-config-input-state').val(err.responseText);
-                        });
+                    RED.notify('POST New Client', 'notice');
+                    if (state === 'PAIRED') {
+                        RED.notify('Client already paired', 'notice');
+                    } else {
+                        $.get('/shc/client', {shcip, clientid,
+                            clientname, password, key, cert})
+                            .done(data => {
+                                if (data === 'PAIRED') {
+                                    RED.notify(data, 'notice');
+                                } else {
+                                    RED.notify(data, 'error');
+                                }
+
+                                $('#node-config-input-state').val(data);
+                            })
+                            .fail(err => {
+                                RED.notify(err.responseText, 'error');
+                            });
+                    }
                 }
             });
         }
@@ -154,4 +183,8 @@
             Pair</a>
         </div>
     </div>
+
+    <input type="hidden" id="node-config-input-private">
+    <input type="hidden" id="node-config-input-cert">
+
 </script>
