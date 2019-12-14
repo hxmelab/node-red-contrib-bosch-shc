@@ -15,17 +15,26 @@ This module provides several nodes for interacting with Bosch Smart Home service
 
 ## Device Node
 
-A device node sends events (which are received via long polling from the controller) as soon as any state of a device changes. 
+Events are received via long polling from the SHC as soon as any state of a service changes. Each device has several services. A device node sends either the service as JSON object or a single state if configured. 
 
 ![Device node](docs/device_node.png)
 
-Each device has several services. To send all the related services of a device, select a **Device** and select **all** as a **Service**. The input field **State** can be left blank.
+
+### Get all services of a device
+
+It is also possible to send all the related services of a device. Therefore, select a **Device** and select **all** as a **Service**. The input field **State** can be left blank.
 
 ![All services](docs/device_conf_all.png)
+
+
+### Get a specific service of a device
 
 Select a **Service** to send only objects of the specified service. As soon as any state of this service changes, the node sends an **msg** object containing the new state. No **msg** is sent from the node if the service does not exist or does not refer to the device. 
 
 ![Specific service](docs/device_conf_service.png)
+
+
+### Get a state
 
 To send only a value instead of the entire service object, enter the name of the **State** in the corresponding field. No **msg** is sent from the node if the state does not exist.
 
@@ -35,6 +44,7 @@ To request an edge device any **msg** can be used. The node overwrites **msg.top
 
 ![Request a device](docs/device_node_request.png)
 
+### Set a state
 However, if the **msg.payload** matches the predefined **type** and **range** of the **service** the associated state will be updated with the specified payload value. The following services can be updated:
 
 | Service                             | Payload Type | Payload Range | Information |
