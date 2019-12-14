@@ -122,18 +122,16 @@
                 }
 
                 if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {
-                    RED.notify('Fetching data, please wait...', 'notice');
-                    $.getJSON('/shc/devices', {shcip: shcConfig.shcip, clientid: shcConfig.clientid})
+                    RED.notify('Requesting devices, please wait...', 'notice');
+                    $.getJSON('/shc/devices', {config: shcConfig.id})
                         .done(devices => {
-                            $.getJSON('/shc/rooms', {shcip: shcConfig.shcip, clientid: shcConfig.clientid})
+                            $.getJSON('/shc/rooms', {config: shcConfig.id})
                                 .done(rooms => {
                                     populate(rooms, devices);
-                                    console.log(rooms);
                                 })
                                 .fail(err => {
                                     RED.notify(err.responseText, 'error');
                                 });
-                            console.log(devices);
                         })
                         .fail(err => {
                             RED.notify(err.responseText, 'error');
@@ -163,15 +161,17 @@
             const serviceBoxSelect = '<select id="node-input-service" style="width: 100%;" />';
 
             function lookupServices(sVal, dVal) {
-                const selectService = $('#node-input-service');
-                const optGroup = $('<optgroup label="Services"></optgroup>');
-                selectService.append(optGroup);
+                if (dVal) {
+                    const selectService = $('#node-input-service');
+                    const optGroup = $('<optgroup label="Services"></optgroup>');
+                    selectService.append(optGroup);
 
-                const sList = dVal.split('|')[3].split(',');
-                selectService.append($('<option/>').val('all').text('all'));
-                sList.forEach(element => {
-                    selectService.append($('<option/>').val(element).text(element));
-                });
+                    const sList = dVal.split('|')[3].split(',');
+                    selectService.append($('<option/>').val('all').text('all'));
+                    sList.forEach(element => {
+                        selectService.append($('<option/>').val(element).text(element));
+                    });
+                }
             }
 
             $('#node-input-lookup-service').click(() => {

@@ -16,51 +16,107 @@ module.exports = function (RED) {
             this.clientname = config.clientname;
             this.state = config.state;
             this.password = this.credentials.password;
-            this.private = JSON.stringify(this.credentials.private);
-            this.cert = JSON.stringify(this.credentials.cert);
+            this.key = this.credentials.key;
+            this.cert = this.credentials.cert;
 
             this.pollid = null;
+            this.connected = false;
             this.on('close', this.destructor);
 
             if (this.state === 'PAIRED') {
                 this.shc = new BoschSmartHomeBridgeBuilder.builder()
                     .withHost(this.shcip)
                     .withClientCert(JSON.parse(this.cert))
-                    .withClientPrivateKey(JSON.parse(this.private))
+                    .withClientPrivateKey(JSON.parse(this.key))
                     .withLogger(new ShcLogger())
                     .build();
 
-                this.poll();
+                this.shc.getBshcClient().getInformation().subscribe(() => {
+                    this.connected = true;
+                    this.emit('shc-events', null);
+                    this.poll();
+                }, err => {
+                    this.reconnect(err);
+                });
             }
         }
 
         async destructor(done) {
             await this.unsubscribe();
+            this.shc = null;
             done();
         }
 
-        subscribe() {
-            this.shc.getBshcClient().subscribe('').subscribe(result => {
-                this.pollid = result.result;
-                this.log('Long polling SHC: ' + this.shcip + ' with poll Id: ' + this.pollid);
-                this.emit('shc-events', []);
-                this.poll();
-            }, err => {
+        isPaired() {
+            return (this.state === 'PAIRED');
+        }
+
+        reconnect(err) {
+            this.connected = false;
+            this.emit('shc-events', null);
+            if (err) {
                 this.error(err);
-                this.emit('shc-events', {error: err});
-            });
+            }
+
+            setTimeout(() => {
+                this.poll();
+            }, 20000);
+        }
+
+        /**
+         * Check connection state and set status.
+         */
+        checkConnection(node) {
+            if (node.shcConfig && node.shcConfig.isPaired()) {
+                if (node.shcConfig.connected) {
+                    node.status({fill: 'green', shape: 'dot', text: 'node-red:common.status.connected'});
+                } else {
+                    node.status({fill: 'red', shape: 'ring', text: 'node-red:common.status.disconnected'});
+                }
+            } else {
+                node.status({fill: 'blue', shape: 'ring', text: 'not paired'});
+            }
+        }
+
+        registerListener(node) {
+            if (node.shcConfig && node.shcConfig.isPaired()) {
+                node.shcConfig.addListener('shc-events', data => {
+                    node.shcConfig.checkConnection(node);
+                    if (data) {
+                        node.listener(data);
+                    }
+                });
+            }
+        }
+
+        subscribe() {
+            if (this.shc) {
+                this.shc.getBshcClient().subscribe('').subscribe(result => {
+                    if (result._parsedResponse.result) {
+                        this.pollid = result._parsedResponse.result;
+                        this.log('Long polling SHC: ' + this.shcip + ' with poll Id: ' + this.pollid);
+                        this.poll();
+                    } else {
+                        this.reconnect();
+                    }
+                }, err => {
+                    this.reconnect(err);
+                });
+            }
         }
 
         poll() {
             if (this.pollid) {
                 this.shc.getBshcClient().longPolling('', this.pollid).subscribe(data => {
-                    if (data.result) {
-                        this.emit('shc-events', data.result);
+                    this.connected = true;
+                    if (data._parsedResponse.result) {
+                        this.emit('shc-events', data._parsedResponse.result);
                         this.poll();
+                    } else {
+                        this.reconnect();
                     }
                 }, err => {
-                    this.error(err);
-                    this.emit('shc-events', {error: err});
+                    this.reconnect(err);
                 });
             } else {
                 this.subscribe();
@@ -131,7 +187,7 @@ module.exports = function (RED) {
         const shc = new BoschSmartHomeBridgeBuilder.builder()
             .withHost(req.query.shcip)
             .withClientCert(JSON.parse(req.query.cert))
-            .withClientPrivateKey(JSON.parse(req.query.private))
+            .withClientPrivateKey(JSON.parse(req.query.key))
             .withLogger(new ShcLogger())
             .build();
 
@@ -156,17 +212,22 @@ module.exports = function (RED) {
      * Webhook to fetch scenario list
      */
     RED.httpAdmin.get('/shc/scenarios', RED.auth.needsPermission('shc.read'), (req, result) => {
+        const configNode = RED.nodes.getNode(req.query.config);
+        if (!configNode) {
+            return;
+        }
+
         const shc = new BoschSmartHomeBridgeBuilder.builder()
-            .withHost(req.query.shcip)
-            .withClientCert(JSON.parse(req.query.cert))
-            .withClientPrivateKey(JSON.parse(req.query.private))
+            .withHost(configNode.shcip)
+            .withClientCert(JSON.parse(configNode.credentials.cert))
+            .withClientPrivateKey(JSON.parse(configNode.credentials.key))
             .withLogger(new ShcLogger())
             .build();
 
         shc.getBshcClient().getScenarios().subscribe(res => {
-            if (res) {
+            if (res && res._parsedResponse) {
                 result.set({'content-type': 'application/json; charset=utf-8'});
-                result.end(JSON.stringify(res));
+                result.end(JSON.stringify(res._parsedResponse));
             }
         }, err => {
             this.error(err);
@@ -179,17 +240,22 @@ module.exports = function (RED) {
      * Webhook to fetch room list
      */
     RED.httpAdmin.get('/shc/rooms', RED.auth.needsPermission('shc.read'), (req, result) => {
+        const configNode = RED.nodes.getNode(req.query.config);
+        if (!configNode) {
+            return;
+        }
+
         const shc = new BoschSmartHomeBridgeBuilder.builder()
-            .withHost(req.query.shcip)
-            .withClientCert(JSON.parse(req.query.cert))
-            .withClientPrivateKey(JSON.parse(req.query.private))
+            .withHost(configNode.shcip)
+            .withClientCert(JSON.parse(configNode.credentials.cert))
+            .withClientPrivateKey(JSON.parse(configNode.credentials.key))
             .withLogger(new ShcLogger())
             .build();
 
         shc.getBshcClient().getRooms().subscribe(res => {
-            if (res) {
+            if (res && res._parsedResponse) {
                 result.set({'content-type': 'application/json; charset=utf-8'});
-                result.end(JSON.stringify(res));
+                result.end(JSON.stringify(res._parsedResponse));
             }
         }, err => {
             this.error(err);
@@ -202,17 +268,22 @@ module.exports = function (RED) {
      * Webhook to fetch device list
      */
     RED.httpAdmin.get('/shc/devices', RED.auth.needsPermission('shc.read'), (req, result) => {
+        const configNode = RED.nodes.getNode(req.query.config);
+        if (!configNode) {
+            return;
+        }
+
         const shc = new BoschSmartHomeBridgeBuilder.builder()
-            .withHost(req.query.shcip)
-            .withClientCert(JSON.parse(req.query.cert))
-            .withClientPrivateKey(JSON.parse(req.query.private))
+            .withHost(configNode.shcip)
+            .withClientCert(JSON.parse(configNode.credentials.cert))
+            .withClientPrivateKey(JSON.parse(configNode.credentials.key))
             .withLogger(new ShcLogger())
             .build();
 
         shc.getBshcClient().getDevices().subscribe(res => {
-            if (res) {
+            if (res && res._parsedResponse) {
                 result.set({'content-type': 'application/json; charset=utf-8'});
-                result.end(JSON.stringify(res));
+                result.end(JSON.stringify(res._parsedResponse));
             }
         }, err => {
             this.error(err);
@@ -225,17 +296,22 @@ module.exports = function (RED) {
      * Webhook to fetch service list
      */
     RED.httpAdmin.get('/shc/services', RED.auth.needsPermission('shc.read'), (req, result) => {
+        const configNode = RED.nodes.getNode(req.query.config);
+        if (!configNode) {
+            return;
+        }
+
         const shc = new BoschSmartHomeBridgeBuilder.builder()
-            .withHost(req.query.shcip)
-            .withClientCert(JSON.parse(req.query.cert))
-            .withClientPrivateKey(JSON.parse(req.query.private))
+            .withHost(configNode.shcip)
+            .withClientCert(JSON.parse(configNode.credentials.cert))
+            .withClientPrivateKey(JSON.parse(configNode.credentials.key))
             .withLogger(new ShcLogger())
             .build();
 
         shc.getBshcClient().getDeviceServices().subscribe(res => {
-            if (res) {
+            if (res && res._parsedResponse) {
                 result.set({'content-type': 'application/json; charset=utf-8'});
-                result.end(JSON.stringify(res));
+                result.end(JSON.stringify(res._parsedResponse));
             }
         }, err => {
             this.error(err);
@@ -247,7 +323,7 @@ module.exports = function (RED) {
     RED.nodes.registerType('shc-config', ShcConfigNode, {
         credentials: {
             password: {type: 'password'},
-            private: {type: 'password'},
+            key: {type: 'password'},
             cert: {type: 'password'}
         }
     });

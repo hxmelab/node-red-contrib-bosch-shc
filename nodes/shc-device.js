@@ -13,43 +13,35 @@ module.exports = function (RED) {
 
             this.shcConfig = RED.nodes.getNode(config.shc);
 
+            if (this.shcConfig) {
+                this.shcConfig.checkConnection(this);
+                this.shcConfig.registerListener(this);
+            }
+
             /**
              *
              */
             this.on('input', (msg, send, done) => {
-                if (this.shcConfig && this.shcConfig.state === 'PAIRED') {
+                if (this.shcConfig && this.shcConfig.connected) {
                     if (this.isValid(msg.payload) && this.getServiceBody(msg.payload)) {
-                        this.shcConfig.shc.getBshcClient().putState(this.getPath(), this.getServiceBody(msg.payload)).subscribe(result => {
-                            send(result);
+                        this.shcConfig.shc.getBshcClient().putState(this.getPath(),
+                            this.getServiceBody(msg.payload)).subscribe(result => {
+                            send(result._parsedResponse);
                             done();
                         }, err => {
                             done(err);
                         });
-                    } else {
-                        this.shcConfig.shc.getBshcClient().getDeviceServices(this.deviceId, this.serviceId).subscribe(result => {
-                            send(this.setMsgObject(result, msg));
-                            done();
-                        }, err => {
-                            done(err);
-                        });
+                    } else if (this.deviceId && this.serviceId) {
+                        this.shcConfig.shc.getBshcClient()
+                            .getDeviceServices(this.deviceId, this.serviceId).subscribe(result => {
+                                send(this.setMsgObject(result._parsedResponse, msg));
+                                done();
+                            }, err => {
+                                done(err);
+                            });
                     }
                 }
             });
-
-            /**
-             * Check configuration state
-             */
-            if (this.shcConfig) {
-                if (this.shcConfig.state === 'PAIRED') {
-                    this.status({fill: 'green', shape: 'dot', text: 'node-red:common.status.connected'});
-                } else {
-                    this.status({fill: 'blue', shape: 'ring', text: 'Add Client'});
-                }
-            } else {
-                this.status({fill: 'blue', shape: 'ring', text: 'Add Configuration'});
-            }
-
-            this.registerListener();
         }
 
         setMsgObject(res, msg) {
@@ -109,25 +101,12 @@ module.exports = function (RED) {
         }
 
         listener(data) {
-            if (data.error) {
-                this.status({fill: 'red', shape: 'ring', text: 'node-red:common.status.disconnected'});
-            } else {
-                this.status({fill: 'green', shape: 'dot', text: 'node-red:common.status.connected'});
-                const parsed = JSON.parse(JSON.stringify(data));
-                parsed.forEach(msg => {
-                    if (this.isRelevant(msg)) {
-                        this.send(this.setMsgObject(msg, msg));
-                    }
-                });
-            }
-        }
-
-        registerListener() {
-            if (this.shcConfig && this.shcConfig.state === 'PAIRED') {
-                this.shcConfig.addListener('shc-events', data => {
-                    this.listener(data);
-                });
-            }
+            const parsed = JSON.parse(JSON.stringify(data));
+            parsed.forEach(msg => {
+                if (this.isRelevant(msg)) {
+                    this.send(this.setMsgObject(msg, msg));
+                }
+            });
         }
     }
 

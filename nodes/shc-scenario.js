@@ -9,32 +9,27 @@ module.exports = function (RED) {
             this.name = config.name;
             this.shcConfig = RED.nodes.getNode(config.shc);
 
-            /**
-             * Triggers on any input msg the configured scenario
-             */
-            this.on('input', (msg, send, done) => {
-                if (this.scenario && this.shcConfig && this.shcConfig.state === 'PAIRED') {
-                    this.shcConfig.shc.getBshcClient().triggerScenario(this.scenario).subscribe(() => {
-                        done();
-                    }, err => {
-                        done(err);
-                    });
-                }
-            });
+            if (this.shcConfig) {
+                this.shcConfig.checkConnection(this);
+                this.shcConfig.registerListener(this);
+            }
 
             /**
-             * Check configuration state
+             * Any input msg triggers the configured scenario
              */
-            if (this.shcConfig && this.scenario) {
-                if (this.shcConfig.state === 'PAIRED') {
-                    this.status({fill: 'green', shape: 'dot', text: 'node-red:common.status.connected'});
-                } else {
-                    this.status({fill: 'blue', shape: 'ring', text: 'Add Client'});
+            this.on('input', (msg, send, done) => {
+                if (this.scenario && this.shcConfig && this.shcConfig.connected) {
+                    this.shcConfig.shc.getBshcClient()
+                        .triggerScenario(this.scenario).subscribe(() => {
+                            done();
+                        }, err => {
+                            done(err);
+                        });
                 }
-            } else {
-                this.status({fill: 'blue', shape: 'ring', text: 'Add Configuration'});
-            }
+            });
         }
+
+        listener() {}
     }
 
     RED.nodes.registerType('shc-scenario', SHCScenarioNode);

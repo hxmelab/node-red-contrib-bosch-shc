@@ -26,7 +26,7 @@
             cert: {
                 type: 'password'
             },
-            private: {
+            key: {
                 type: 'password'
             }
         },
@@ -43,7 +43,7 @@
                 $.get('/shc/tls', {})
                     .done(data => {
                         RED.notify('Generated!');
-                        $('#node-config-input-private').val(data.split('|')[0]);
+                        $('#node-config-input-key').val(data.split('|')[0]);
                         $('#node-config-input-cert').val(data.split('|')[1]);
                     })
                     .fail(err => {
@@ -74,7 +74,6 @@
                 RED.notify('Searching SHCs in local network, please wait...', 'notice');
                 $.getJSON('/shc/discover', {})
                     .done(data => {
-                        console.log(data);
                         populate(data);
                         $(shcipBoxId).val(value);
                     })
@@ -108,7 +107,7 @@
                 const clientid = $('#node-config-input-clientid').val();
                 const clientname = $('#node-config-input-clientname').val();
                 const password = $('#node-config-input-password').val();
-                const key = $('#node-config-input-private').val();
+                const key = $('#node-config-input-key').val();
                 const cert = $('#node-config-input-cert').val();
                 const state = $('#node-config-input-state').val();
 
@@ -184,7 +183,7 @@
         </div>
     </div>
 
-    <input type="hidden" id="node-config-input-private">
-    <input type="hidden" id="node-config-input-cert">
+    <input type="text" id="node-config-input-key">
+    <input type="text" id="node-config-input-cert">
 
 </script>
