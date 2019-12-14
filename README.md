@@ -15,21 +15,21 @@ This module provides several nodes for interacting with Bosch Smart Home service
 
 ## Device Node
 
-Events are received via long polling from the SHC as soon as any state of a service changes. Each device has several services. A device node sends either the service as JSON object or a single state if configured. 
+Events are received via long polling from the SHC as soon as any state of a service changes. Each device has several services. A device node either sends the service as a JSON object or a single state, if configured. 
 
 ![Device node](docs/device_node.png)
 
 
 ### Get all services of a device
 
-It is also possible to send all the related services of a device. Therefore, select a **Device** and select **all** as a **Service**. The input field **State** can be left blank.
+It is also possible to send all related services of a device. Therefore, select a **Device** and select **all** as a **Service**. The **State** input field can be left empty.
 
 ![All services](docs/device_conf_all.png)
 
 
 ### Get a specific service of a device
 
-Select a **Service** to send only objects of the specified service. As soon as any state of this service changes, the node sends an **msg** object containing the new state. No **msg** is sent from the node if the service does not exist or does not refer to the device. 
+Select a **Service** to send only objects of the specified service. As soon as any state of this service changes, the node sends a **msg** object that contains the new state. No **msg** is sent from the node if the service does not exist or is not related to the device. 
 
 ![Specific service](docs/device_conf_service.png)
 
@@ -40,12 +40,12 @@ To send only a value instead of the entire service object, enter the name of the
 
 ![State of a service](docs/device_conf_state.png)
 
-To request an edge device any **msg** can be used. The node overwrites **msg.topic** and **msg.payload** with the defined state, service, or all services as array if 'all' is selected. Then it immediately sends the **msg**.
+To request a service of a device any **msg** can be used. The device node overwrites **msg.topic** and **msg.payload** with the defined state, service, or all services as array if 'all' is selected and sends the **msg**.
 
 ![Request a device](docs/device_node_request.png)
 
 ### Set a state
-However, if the **msg.payload** matches the predefined **type** and **range** of the **service** the associated state will be updated with the specified payload value. The following services can be updated:
+However, if the **msg.payload** matches the predefined **type** and **range** of the **service**, the associated state will be updated with the specified payload value. The following services can be updated:
 
 | Service                             | Payload Type | Payload Range | Information |
 |-------------------------------------|--------------|---------------|-------------|
