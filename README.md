@@ -3,7 +3,7 @@
 This module provides several nodes for interacting with Bosch Smart Home services and edge devices via the local controller API. A full documentation of the API can be found [here](https://apidocs.bosch-smarthome.com/local/).
 
 
-### Release info
+### Release Note
 
 With the update to v0.1.7 or higher, the configuration of the SHC must be created again if you have created SHC configurations with version v0.0.6 or earlier. Therefore, please delete old SHC configurations first and recreate them after the update. 
 
