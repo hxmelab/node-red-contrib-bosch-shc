@@ -3,6 +3,15 @@
 This module provides several nodes for interacting with Bosch Smart Home services and edge devices via the local controller API. A full documentation of the API can be found [here](https://apidocs.bosch-smarthome.com/local/).
 
 
+### Release info
+
+With the update to v0.1.7 or higher, the configuration of the SHC must be created again if you have created SHC configurations with version v0.0.6 or earlier. Therefore, please delete old SHC configurations first and recreate them after the update. 
+
+The reason for this is a change of the certificate handling. As of v0.1.7, the certificates are stored in Node-RED. This makes the whole thing more secure if Node-RED itself is properly secured. After the update you can delete the directory "/certs" in "~/.node-red". 
+
+If you encounter any problem, do not hesitate to create an issue.
+
+
 ### Features
 
 - Local network discovery of the SHC
@@ -15,7 +24,7 @@ This module provides several nodes for interacting with Bosch Smart Home service
 
 ## Device Node
 
-Events are received via long polling from the SHC as soon as any state of a service changes. Each device has several services. A device node either sends the service as a JSON object or a single state, if configured. 
+Events are received via long polling from the SHC as soon as any state of a service changes. Each device has several services. A device node either sends the service as a JSON object or a single state, if configured [https://github.com/hxmelab/node-red-contrib-bosch-shc/tree/4_FixClientCert#get-a-state](this way).
 
 ![Device node](docs/device_node.png)
 
@@ -29,14 +38,14 @@ It is also possible to send all related services of a device. Therefore, select 
 
 ### Get a specific service of a device
 
-Select a **Service** to send only objects of the specified service. As soon as any state of this service changes, the node sends a **msg** object that contains the new state. No **msg** is sent from the node if the service does not exist or is not related to the device. 
+Select a **Service** to send only objects of the specified service. As soon as any state of this service changes, the node sends a **msg** object that contains the new state. An **ENTITY_NOT_FOUND** error message is sent from the node if the service does not exist or is not related to the device. 
 
 ![Specific service](docs/device_conf_service.png)
 
 
 ### Get a state
 
-To send only a value instead of the entire service object, enter the name of the **State** in the corresponding field. No **msg** is sent from the node if the state does not exist.
+To send only a value instead of the entire service object, enter the name of the **State** in the corresponding field. The **service object** is sent from the node if the state does not exist.
 
 ![State of a service](docs/device_conf_state.png)
 
@@ -54,7 +63,7 @@ However, if the **msg.payload** matches the predefined **type** and **range** of
 | **SmokeDetectorCheck**              | boolean      | true, false    | Triggers a test alarm on this device |
 | **PowerSwitch**                     | boolean      | true, false    | Turn device on/off |
 | **PrivacyMode**                     | boolean      | true, false    | Activate/deactivate camera privacy mode |
-| **ClimateControl**                  | Number       | 5.0, 5.5, ..., 29.5, 30.0       | Set a room temperature |
+| **RoomClimateControl**                  | Number       | 5.0, 5.5, ..., 29.5, 30.0       | Set a room temperature |
 | **ShutterControl**                  | Number       | 0.000, 0.005, ..., 0.995, 1.000 | Set the level of a shutter |
 
 

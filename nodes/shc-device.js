@@ -53,7 +53,8 @@ module.exports = function (RED) {
                     msg.topic = res.state['@type'];
                 }
 
-                if (this.state.length > 0) {
+                if (this.state.length > 0  && res.state && 
+                    res.state.hasOwnProperty(this.state)) {
                     msg.payload = res.state[this.state];
                 } else {
                     msg.payload = res;
