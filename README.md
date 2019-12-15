@@ -45,7 +45,7 @@ Select a **Service** to send only objects of the specified service. As soon as a
 
 ### Get a state
 
-To send only a value instead of the entire service object, enter the name of the **State** in the corresponding field. The **service object** is sent from the node if the state does not exist.
+To send only a value instead of the entire service object, enter the name of the **State** in the corresponding field. The **service object** is sent from the node if the state does not exist or is not related to the service.
 
 ![State of a service](docs/device_conf_state.png)
 
