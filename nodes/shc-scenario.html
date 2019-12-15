@@ -20,7 +20,7 @@
         outputs: 0,
         icon: 'inject.png',
         label() {
-            return this.name || 'shc scenario';
+            return this.name || this.scenario.split('|')[0] || 'shc scenario';
         },
         paletteLabel: 'scenario',
         oneditprepare() {
@@ -53,12 +53,12 @@
                 }
 
                 if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {
-                    RED.notify('Fetching data, please wait...', 'notice');
-                    $.getJSON('/shc/scenarios', {shcip: shcConfig.shcip, clientid: shcConfig.clientid})
+                    RED.notify('Requesting scenarios, please wait...', 'notice');
+    
+                    $.getJSON('/shc/scenarios', {config: shcConfig.id})
                         .done(scenarios => {
                             populate(scenarios);
                             $(scenarioBoxId).val(value);
-                            console.log(scenarios);
                         })
                         .fail(err => {
                             RED.notify(err.responseText, 'error');

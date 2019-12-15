@@ -1,21 +1,33 @@
+const DEBUG = false;
+
 module.exports = class ShcLogger {
-    fine() {
-        //console.log('fine', ...arguments);
+    fine(...args) {
+        if (DEBUG) {
+            console.log('fine', ...args);
+        }
     }
 
-    debug() {
-        //console.log('debug', ...arguments);
+    debug(...args) {
+        if (DEBUG) {
+            console.log('debug', ...args);
+        }
     }
 
-    info() {
-        //console.log('info', ...arguments);
+    info(...args) {
+        if (DEBUG) {
+            console.log('info', ...args);
+        }
     }
 
-    warn() {
-        //console.log('warn', ...arguments);
+    warn(...args) {
+        if (DEBUG) {
+            console.log('warn', ...args);
+        }
     }
 
-    error() {
-        //console.log('error', ...arguments);
+    error(...args) {
+        if (DEBUG) {
+            console.log('error', ...args);
+        }
     }
 };

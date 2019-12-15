@@ -17,7 +17,7 @@
             }
         },
         label() {
-            return this.name || 'shc faults';
+            return this.name || (this.debug?'shc debug':'shc faults');
         },
         paletteLabel: 'faults',
         icon: 'debug.png'
