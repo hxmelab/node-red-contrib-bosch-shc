@@ -27,7 +27,7 @@
         outputs: 1,
         icon: 'bosch-smarthome-icon.png',
         label() {
-            return this.name || 'shc device';
+            return this.name || this.device.split('|')[0] || 'shc device';
         },
         paletteLabel: 'device',
         oneditprepare() {

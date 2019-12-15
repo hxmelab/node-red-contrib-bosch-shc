@@ -20,7 +20,7 @@
         outputs: 0,
         icon: 'inject.png',
         label() {
-            return this.name || 'shc scenario';
+            return this.name || this.scenario.split('|')[0] || 'shc scenario';
         },
         paletteLabel: 'scenario',
         oneditprepare() {
