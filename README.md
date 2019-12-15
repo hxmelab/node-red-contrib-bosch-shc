@@ -24,7 +24,7 @@ If you encounter any problem, do not hesitate to create an issue.
 
 ## Device Node
 
-Events are received via long polling from the SHC as soon as any state of a service changes. Each device has several services. A device node either sends the service as a JSON object or a single state, if configured [this way](https://github.com/hxmelab/node-red-contrib-bosch-shc/tree/4_FixClientCert#get-a-state).
+Events are received via long polling from the SHC as soon as any state of a service changes. Each device has several services. A device node either sends the service as a JSON object or a single state, if configured [this way](https://github.com/hxmelab/node-red-contrib-bosch-shc/#get-a-state).
 
 ![Device node](docs/device_node.png)
 
