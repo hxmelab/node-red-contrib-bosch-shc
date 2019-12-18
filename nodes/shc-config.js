@@ -9,6 +9,7 @@ module.exports = function (RED) {
     class ShcConfigNode {
         constructor(config) {
             RED.nodes.createNode(this, config);
+            this.setMaxListeners(256);
 
             this.shcid = config.shcid;
             this.shcip = config.shcip;
