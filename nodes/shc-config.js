@@ -45,6 +45,7 @@ module.exports = function (RED) {
         async destructor(done) {
             await this.unsubscribe();
             this.shc = null;
+            this.pollid = null;
             done();
         }
 
@@ -92,9 +93,9 @@ module.exports = function (RED) {
 
         subscribe() {
             if (this.shc) {
-                this.shc.getBshcClient().subscribe('').subscribe(result => {
-                    if (result._parsedResponse.result) {
-                        this.pollid = result._parsedResponse.result;
+                this.shc.getBshcClient().subscribe('').subscribe(data => {
+                    if (data && data._parsedResponse && data._parsedResponse.result) {
+                        this.pollid = data._parsedResponse.result;
                         this.log('Long polling SHC: ' + this.shcip + ' with poll Id: ' + this.pollid);
                         this.poll();
                     } else {
@@ -110,7 +111,7 @@ module.exports = function (RED) {
             if (this.pollid) {
                 this.shc.getBshcClient().longPolling('', this.pollid).subscribe(data => {
                     this.connected = true;
-                    if (data._parsedResponse.result) {
+                    if (data && data._parsedResponse && data._parsedResponse.result) {
                         this.emit('shc-events', data._parsedResponse.result);
                         this.poll();
                     } else {
@@ -128,8 +129,7 @@ module.exports = function (RED) {
             return new Promise(resolve => {
                 if (this.state === 'PAIRED' && this.pollid) {
                     this.shc.getBshcClient().unsubscribe('', this.pollid).subscribe(() => {
-                        this.log('Unsubscribe SHC: ' + this.shcip + ' with poll Id: ' + this.pollid);
-                        this.pollid = null;
+                        this.log('Unsubscribed SHC: ' + this.shcip + ' with poll Id: ' + this.pollid);
                         resolve();
                     });
                 } else {
