@@ -25,7 +25,7 @@ If you encounter any problem, do not hesitate to create an issue.
 
 ## Device Node
 
-To receive data from the SHC, there are two ways either via long polling or via a request. Please note that you should always prefer the long polling mechanism to receive data from the SHC rather than requesting it with a trigger. However, sometimes it is useful to request a state at a specific point in time.
+To receive data from the SHC, there are two ways either via [long polling](#long-polling) or via a [request](#requesting). Please note that you should always prefer the long polling mechanism to receive data from the SHC rather than requesting it with a trigger. However, sometimes it is useful to request a state at a specific point in time.
 
 
 ### Long Polling
