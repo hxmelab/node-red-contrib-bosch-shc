@@ -25,19 +25,19 @@ If you encounter any problem, do not hesitate to create an issue.
 
 ## Device Node
 
-To receive data from the SHC, there are two ways either via [long polling](#long-polling) or via a [request](#requesting). Please note that you should always prefer the long polling mechanism to receive data from the SHC rather than requesting it with a trigger. However, sometimes it is useful to request a state at a specific point in time.
+There are two ways to receive data from the SHC, either by [long polling](#long-polling) or by a [request](#requesting). Please note that you should always prefer the long polling mechanism to receive data from the SHC rather than requesting it. However, sometimes it is useful to request a state at a specific time, but you should not do this too often in a short time period, as described [here](https://github.com/BoschSmartHome/bosch-shc-api-docs#limit-the-number-of-requests-in-a-given-time-period).
 
 
 ### Long Polling
 
-Events are received via **long polling** from the SHC as soon as any state of a service changes. Each device has several services. A device node sends either [all related services of a device](#get-all-services-of-a-device), [a specific service](#get-a-specific-service-of-a-device) or a [single state](#get-a-state).
+By default events are received via **long polling** from the SHC as soon as any state of a service changes. Each device has several services. A device node sends either [all related services of a device](#get-all-services-of-a-device), [a specific service](#get-a-specific-service-of-a-device) or a [single state](#get-a-state).
 
 ![Device node](docs/device_node.png)
 
 
 ### Requesting
 
-To request a device any **msg** can be used, if the **msg.payload** does not match the values to [set a state](#set-a-state). The device node overwrites **msg.topic** and **msg.payload** with the state, service, or all services as array, as configured in the node configuration page.
+To request a device any **msg** can be used, if the **msg.payload** does not match the values to [set a state](#set-a-state). The device node overwrites **msg.topic** and **msg.payload** with the state, service, or all services as array, as configured in the device node configuration page.
 
 ![Request a device](docs/device_node_request.png)
 
