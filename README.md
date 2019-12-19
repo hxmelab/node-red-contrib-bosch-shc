@@ -2,7 +2,7 @@
 
 This module provides several nodes for interacting with Bosch Smart Home services and edge devices via the local controller API. A full documentation of the API can be found [here](https://apidocs.bosch-smarthome.com/local/).
 
-**Compatible with Node-RED version 1.0.0 or higher**
+**Compatible with Node-RED version 1.0.0 or higher.**
 
 ### Release Note
 
