@@ -25,11 +25,11 @@ If you encounter any problem, do not hesitate to create an issue.
 
 ## Device Node
 
-Events are received via **long polling** from the SHC as soon as any state of a service changes. Each device has several services. A device node either sends [all related services of a device](#get-all-services-of-a-device), [a specific service](#get-a-specific-service-of-a-device) or a [single state](#get-a-state).
+Events are received via **long polling** from the SHC as soon as any state of a service changes. Each device has several services. A device node sends either [all related services of a device](#get-all-services-of-a-device), [a specific service](#get-a-specific-service-of-a-device) or a [single state](#get-a-state).
 
 ![Device node](docs/device_node.png)
 
-To request a service of a device any **msg** can be used, if the **msg.payload** does not match the values to [set a state](#set-a-state). The device node overwrites the **msg.topic** and the **msg.payload** with the state, service, or all services as array as configured in the nodes configuration page. Please note, you should always prefer the long polling mechanism to receive data from the SHC instead of requesting it with a trigger. However, sometimes it is useful to check a state at a certain moment.
+To request a device any **msg** can be used, if the **msg.payload** does not match the values to [set a state](#set-a-state). The device node overwrites **msg.topic** and **msg.payload** with the state, service, or all services as array as configured in the nodes configuration page. Please note, you should always prefer the long polling mechanism to receive data from the SHC instead of requesting it with a trigger. However, sometimes it is useful to check a state at a certain moment.
 
 ![Request a device](docs/device_node_request.png)
 
