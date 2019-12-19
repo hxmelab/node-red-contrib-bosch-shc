@@ -25,24 +25,33 @@ If you encounter any problem, do not hesitate to create an issue.
 
 ## Device Node
 
+To receive data from the SHC, there are two ways either via long polling or via a request. Please note that you should always prefer the long polling mechanism to receive data from the SHC rather than requesting it with a trigger. However, sometimes it is useful to request a state at a specific point in time.
+
+
+### Long Polling
+
 Events are received via **long polling** from the SHC as soon as any state of a service changes. Each device has several services. A device node sends either [all related services of a device](#get-all-services-of-a-device), [a specific service](#get-a-specific-service-of-a-device) or a [single state](#get-a-state).
 
 ![Device node](docs/device_node.png)
 
-To request a device any **msg** can be used, if the **msg.payload** does not match the values to [set a state](#set-a-state). The device node overwrites **msg.topic** and **msg.payload** with the state, service, or all services as array as configured in the nodes configuration page. Please note, you should always prefer the long polling mechanism to receive data from the SHC instead of requesting it with a trigger. However, sometimes it is useful to check a state at a certain moment.
+
+### Requesting
+
+To request a device any **msg** can be used, if the **msg.payload** does not match the values to [set a state](#set-a-state). The device node overwrites **msg.topic** and **msg.payload** with the state, service, or all services as array, as configured in the node configuration page.
 
 ![Request a device](docs/device_node_request.png)
 
+
 ### Get all services of a device
 
-To send all related services of a device, select a **Device** and select **all** as a **Service**. The **State** input field can be left empty. The **msg.payload** will contain a JSON array with all related services if you request it, otherwise a single JSON object will be sent via long polling.
+To send all related services of a device, select a **Device** and select **all** as a **Service**. The **State** input field can be left empty. The **msg.payload** contains a JSON array with all related services, if you request it. If received via long polling, a single JSON service object is sent.
 
 ![All services](docs/device_conf_all.png)
 
 
 ### Get a specific service of a device
 
-Select a **Service** to send only JSON objects of the specified service. By requesting the service an **ENTITY_NOT_FOUND** error message is sent from the node if the service does not exist or is not related to the device. Via long polling no message will be sent from the node.
+Select a **Service** to send only JSON objects of the specified service. Requesting the service sends an **ENTITY_NOT_FOUND** error message if the service does not exist or is not related to the device. Via long polling, no **msg** will be sent from the node.
 
 ![Specific service](docs/device_conf_service.png)
 
