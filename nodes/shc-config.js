@@ -142,7 +142,7 @@ module.exports = function (RED) {
     /**
      * Webhook for discovering SHCs in local network
      */
-    RED.httpAdmin.get('/shc/discover', RED.auth.needsPermission('shc.read'), (req, result) => {
+    RED.httpAdmin.get('/shc/discover', (req, result) => {
         function filter(res) {
             const filterList = [];
             res.forEach(element => {
@@ -165,7 +165,7 @@ module.exports = function (RED) {
     /**
      * Webhook for generating an identifier
      */
-    RED.httpAdmin.get('/shc/id', RED.auth.needsPermission('shc.read'), (req, result) => {
+    RED.httpAdmin.get('/shc/id', (req, result) => {
         result.set({'content-type': 'application/json; charset=utf-8'});
         result.end(JSON.stringify('node-red-contrib-bosch-shc-' + ('0000000000' + Math.floor(Math.random() * 10000000000)).slice(-10)));
     });
@@ -173,7 +173,7 @@ module.exports = function (RED) {
     /**
      * Webhook for generating a certificate and a key
      */
-    RED.httpAdmin.get('/shc/tls', RED.auth.needsPermission('shc.read'), (req, result) => {
+    RED.httpAdmin.get('/shc/tls', (req, result) => {
         const tls = BshbUtils.generateClientCertificate();
         const data = JSON.stringify(tls.private) + '|' + JSON.stringify(tls.cert);
 
@@ -212,7 +212,7 @@ module.exports = function (RED) {
     /**
      * Webhook to fetch scenario list
      */
-    RED.httpAdmin.get('/shc/scenarios', RED.auth.needsPermission('shc.read'), (req, result) => {
+    RED.httpAdmin.get('/shc/scenarios', (req, result) => {
         const configNode = RED.nodes.getNode(req.query.config);
         if (!configNode) {
             return;
@@ -240,7 +240,7 @@ module.exports = function (RED) {
     /**
      * Webhook to fetch room list
      */
-    RED.httpAdmin.get('/shc/rooms', RED.auth.needsPermission('shc.read'), (req, result) => {
+    RED.httpAdmin.get('/shc/rooms', (req, result) => {
         const configNode = RED.nodes.getNode(req.query.config);
         if (!configNode) {
             return;
@@ -268,7 +268,7 @@ module.exports = function (RED) {
     /**
      * Webhook to fetch device list
      */
-    RED.httpAdmin.get('/shc/devices', RED.auth.needsPermission('shc.read'), (req, result) => {
+    RED.httpAdmin.get('/shc/devices', (req, result) => {
         const configNode = RED.nodes.getNode(req.query.config);
         if (!configNode) {
             return;
@@ -296,7 +296,7 @@ module.exports = function (RED) {
     /**
      * Webhook to fetch service list
      */
-    RED.httpAdmin.get('/shc/services', RED.auth.needsPermission('shc.read'), (req, result) => {
+    RED.httpAdmin.get('/shc/services', (req, result) => {
         const configNode = RED.nodes.getNode(req.query.config);
         if (!configNode) {
             return;
