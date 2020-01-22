@@ -184,7 +184,7 @@ module.exports = function (RED) {
     /**
      * Webhook to add a client
      */
-    RED.httpAdmin.get('/shc/client', RED.auth.needsPermission('shc.write'), (req, result) => {
+    RED.httpAdmin.get('/shc/client', (req, result) => {
         const shc = new BoschSmartHomeBridgeBuilder.builder()
             .withHost(req.query.shcip)
             .withClientCert(JSON.parse(req.query.cert))
