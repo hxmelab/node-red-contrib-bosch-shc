@@ -40,11 +40,11 @@
 
             if (!this.credentials.has_cert) {
                 RED.notify('Generating new client data. Please wait...');
-                $.get('/shc/tls', {})
+                $.getJSON('/shc/tls', {})
                     .done(data => {
                         RED.notify('Generated!');
-                        $('#node-config-input-key').val(data.split('|')[0]);
-                        $('#node-config-input-cert').val(data.split('|')[1]);
+                        $('#node-config-input-key').val(data.private);
+                        $('#node-config-input-cert').val(data.cert);
                     })
                     .fail(err => {
                         RED.notify(err.responseText, 'error');

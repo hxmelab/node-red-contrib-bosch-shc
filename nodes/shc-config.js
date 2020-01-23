@@ -25,12 +25,22 @@ module.exports = function (RED) {
             this.on('close', this.destructor);
 
             if (this.state === 'PAIRED') {
-                this.shc = new BoschSmartHomeBridgeBuilder.builder()
-                    .withHost(this.shcip)
-                    .withClientCert(JSON.parse(this.cert))
-                    .withClientPrivateKey(JSON.parse(this.key))
-                    .withLogger(new ShcLogger())
-                    .build();
+                // try-block is legacy and will be removed in future. Users with old configurations need to recreate them when try-block is removed.
+                try {
+                    this.shc = new BoschSmartHomeBridgeBuilder.builder()
+                        .withHost(this.shcip)
+                        .withClientCert(JSON.parse(this.cert))
+                        .withClientPrivateKey(JSON.parse(this.key))
+                        .withLogger(new ShcLogger())
+                        .build();
+                } catch (_error) {
+                    this.shc = new BoschSmartHomeBridgeBuilder.builder()
+                        .withHost(this.shcip)
+                        .withClientCert(this.cert)
+                        .withClientPrivateKey(this.key)
+                        .withLogger(new ShcLogger())
+                        .build();
+                }
 
                 this.shc.getBshcClient().getInformation().subscribe(() => {
                     this.connected = true;
@@ -174,11 +184,8 @@ module.exports = function (RED) {
      * Webhook for generating a certificate and a key
      */
     RED.httpAdmin.get('/shc/tls', (req, result) => {
-        const tls = BshbUtils.generateClientCertificate();
-        const data = JSON.stringify(tls.private) + '|' + JSON.stringify(tls.cert);
-
-        result.set({'content-type': 'charset=utf-8'});
-        result.end(data);
+        result.set({'content-type': 'application/json; charset=utf-8'});
+        result.end(JSON.stringify(BshbUtils.generateClientCertificate()));
     });
 
     /**
@@ -187,12 +194,12 @@ module.exports = function (RED) {
     RED.httpAdmin.get('/shc/client', (req, result) => {
         const shc = new BoschSmartHomeBridgeBuilder.builder()
             .withHost(req.query.shcip)
-            .withClientCert(JSON.parse(req.query.cert))
-            .withClientPrivateKey(JSON.parse(req.query.key))
+            .withClientCert(req.query.cert)
+            .withClientPrivateKey(req.query.key)
             .withLogger(new ShcLogger())
             .build();
 
-        result.set({'content-type': 'charset=utf-8'});
+        result.set({'content-type': 'text/plain; charset=utf-8'});
         shc.pairIfNeeded(req.query.clientname, req.query.clientid, req.query.password, 0, -1).subscribe(res => {
             if (res && res._parsedResponse && res._parsedResponse && res._parsedResponse.token) {
                 result.end('PAIRED');
