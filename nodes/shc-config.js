@@ -33,6 +33,7 @@ module.exports = function (RED) {
                         .withClientPrivateKey(JSON.parse(this.key))
                         .withLogger(new ShcLogger())
                         .build();
+                    this.warn('Please create a new SHC Configuration (shc-config) with IP ' + this.shcip + ' and delete this one. The version of this Configuration will expire soon.');
                 } catch (_error) {
                     this.shc = new BoschSmartHomeBridgeBuilder.builder()
                         .withHost(this.shcip)
