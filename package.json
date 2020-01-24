@@ -30,7 +30,7 @@
     }
   },
   "dependencies": {
-    "bosch-smart-home-bridge": "0.2.3",
+    "bosch-smart-home-bridge": "0.2.7",
     "node-dns-sd": "0.4.0"
   },
   "devDependencies": {
@@ -60,7 +60,13 @@
       "eslint-comments/no-unused-disable": 0,
       "promise/prefer-await-to-then": "warn",
       "prefer-object-spread": "warn",
-      "no-unused-vars": [2, {"args": "after-used", "argsIgnorePattern": "^_"}]
+      "no-unused-vars": [
+        2,
+        {
+          "args": "after-used",
+          "argsIgnorePattern": "^_"
+        }
+      ]
     },
     "ignore": []
   }
