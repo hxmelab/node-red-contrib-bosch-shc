@@ -67,8 +67,14 @@ module.exports = function (RED) {
         reconnect(err) {
             this.connected = false;
             this.emit('shc-events', null);
-            // ignore wrong pollid error
-            if (err && err.errorType && err.errorType !== 3) {
+
+            if (err && Number.isInteger(err.errorType)) {
+                switch (err.errorType) {
+                    case 3: this.pollid = null;
+                        break;
+                    default: this.error(err + ' Type ' + err.errorType + ', Try to reconnect...');
+                }
+            } else if (err) {
                 this.error(err);
             }
 
