@@ -5,6 +5,7 @@ module.exports = function (RED) {
         constructor(config) {
             RED.nodes.createNode(this, config);
 
+            this.deviceName = config.device.split('|')[0];
             this.deviceId = config.device.split('|')[1];
             this.deviceModel = config.device.split('|')[2];
             this.serviceId = config.service;
@@ -26,7 +27,10 @@ module.exports = function (RED) {
                     if (this.isValid(msg.payload) && this.getServiceBody(msg.payload)) {
                         this.shcConfig.shc.getBshcClient().putState(this.getPath(),
                             this.getServiceBody(msg.payload)).subscribe(result => {
-                            send(result._parsedResponse);
+                            if (result._parsedResponse && result._parsedResponse.message) {
+                                send({topic: this.deviceName, payload: result._parsedResponse.message});
+                            }
+
                             done();
                         }, err => {
                             done(err);
@@ -34,7 +38,14 @@ module.exports = function (RED) {
                     } else if (this.deviceId && this.serviceId) {
                         this.shcConfig.shc.getBshcClient()
                             .getDeviceServices(this.deviceId, this.serviceId).subscribe(result => {
-                                send(this.setMsgObject(result._parsedResponse, msg));
+                                if (Array.isArray(result._parsedResponse)) {
+                                    result._parsedResponse.forEach(service => {
+                                        send(this.setMsgObject(service));
+                                    });
+                                } else {
+                                    send(this.setMsgObject(result._parsedResponse));
+                                }
+
                                 done();
                             }, err => {
                                 done(err);
@@ -44,24 +55,19 @@ module.exports = function (RED) {
             });
         }
 
-        setMsgObject(res, msg) {
-            if (Array.isArray(res)) {
-                msg.topic = 'serviceArray';
-                msg.payload = res;
-            } else {
-                if (res.state) {
-                    msg.topic = res.state['@type'];
-                }
-
-                if (this.state.length > 0 && res.state &&
-                    Object.prototype.hasOwnProperty.call(res.state, this.state)) {
-                    msg.payload = res.state[this.state];
+        setMsgObject(data) {
+            const msg = {topic: (this.name || this.deviceName)};
+            if (this.state) {
+                if (Object.prototype.hasOwnProperty.call(data.state, this.state)) {
+                    msg.payload = data.state[this.state];
                 } else {
-                    msg.payload = res;
+                    return null;
                 }
+            } else {
+                msg.payload = data;
             }
 
-            return (msg);
+            return msg;
         }
 
         getPath() {
@@ -69,9 +75,9 @@ module.exports = function (RED) {
         }
 
         isRelevant(msg) {
-            return ((this.deviceId === '*' && this.serviceId === '*') ||
-                    (this.deviceId === '*' && this.serviceId === msg.id) ||
-                    (this.deviceId === msg.deviceId && this.serviceId === '*') ||
+            return ((this.deviceId === 'all' && this.serviceId === 'all') ||
+                    (this.deviceId === 'all' && this.serviceId === msg.id) ||
+                    (this.deviceId === msg.deviceId && this.serviceId === 'all') ||
                     (this.deviceId === msg.deviceId && this.serviceId === msg.id));
         }
 
@@ -103,9 +109,9 @@ module.exports = function (RED) {
 
         listener(data) {
             const parsed = JSON.parse(JSON.stringify(data));
-            parsed.forEach(msg => {
-                if (this.isRelevant(msg)) {
-                    this.send(this.setMsgObject(msg, msg));
+            parsed.forEach(event => {
+                if (event.state && this.isRelevant(event)) {
+                    this.send(this.setMsgObject(event));
                 }
             });
         }
