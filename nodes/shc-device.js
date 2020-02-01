@@ -59,7 +59,7 @@ module.exports = function (RED) {
             const msg = {topic: (this.name || this.deviceName)};
             if (this.state) {
                 if (Object.prototype.hasOwnProperty.call(data.state, this.state)) {
-                    msg.payload = data.state[this.state];
+                    msg.payload = this.convertState(data.state[this.state]);
                 } else {
                     return null;
                 }
@@ -67,7 +67,7 @@ module.exports = function (RED) {
                 msg.payload = data;
             }
 
-            return msg;
+            return msg.payload === null ? null : msg;
         }
 
         getPath() {
@@ -99,12 +99,28 @@ module.exports = function (RED) {
                 case 'SmokeDetectorCheck': return {'@type': 'smokeDetectorCheckState', value: 'SMOKE_TEST_REQUESTED'};
                 case 'PowerSwitch': return {'@type': 'powerSwitchState', switchState: (newState ? 'ON' : 'OFF')};
                 case 'RoomClimateControl': return {'@type': 'climateControlState', setpointTemperature: newState};
-                case 'PrivacyMode': return {'@type': 'privacyModeState', value: (newState ? 'ENABLED' : 'DISABLED')};
+                case 'PrivacyMode': return {'@type': 'privacyModeState', value: (newState ? 'DISABLED' : 'ENABLED')};
                 case 'IntrusionDetectionControl': return {'@type': 'intrusionDetectionControlState', value: (newState ? 'SYSTEM_ARMED' : 'SYSTEM_DISARMED')};
                 case 'PresenceSimulationConfiguration': return {'@type': 'presenceSimulationConfigurationState', enabled: newState};
                 case 'ShutterControl': return {'@type': 'shutterControlState', level: newState};
                 default: return false;
             }
+        }
+
+        convertState(state) {
+            if (state === 'ON' || state === 'DISABLED' || state === 'SYSTEM_ARMED') {
+                return true;
+            }
+
+            if (state === 'OFF' || state === 'ENABLED' || state === 'SYSTEM_DISARMED') {
+                return false;
+            }
+
+            if (state === 'SYSTEM_ARMING') {
+                return null;
+            }
+
+            return state;
         }
 
         listener(data) {
