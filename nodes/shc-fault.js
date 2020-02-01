@@ -17,9 +17,9 @@ module.exports = function (RED) {
 
         listener(data) {
             const parsed = JSON.parse(JSON.stringify(data));
-            parsed.forEach(msg => {
-                if (this.debug || msg.faults) {
-                    this.send({topic: 'shc-event', payload: msg});
+            parsed.forEach(event => {
+                if (this.debug || event.faults) {
+                    this.send({topic: 'shc-event', payload: event});
                 }
             });
         }
