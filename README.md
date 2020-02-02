@@ -6,7 +6,7 @@ This module provides several nodes for interacting with Bosch Smart Home service
 
 ### Release Notes
 
-With version **0.2.14**, the **smart thermostat (TRV)** was introduced and optimizations were implemented that improves the interaction with the **Node-RED dashboard**: 
+With version **0.2.14** the **smart thermostat (TRV)** was introduced and optimizations were implemented that improves the interaction with the **Node-RED dashboard**: 
 - **msg.topic** now contains the name of a device, so that several devices can be separated in a **dashboard chart**. You are also free to configure **msg.topic** via the device property **name**.
 - The output of **boolean services** has been aligned with the input if the corresponding **state** is set. The Node-RED **dashboard switch** can now be wired directly to boolean services to toggle a switch state, such as for the camera or the smart plug.
 - The output for **all** services of a device is no longer an array. Instead each service is send as a separate **msg**.
