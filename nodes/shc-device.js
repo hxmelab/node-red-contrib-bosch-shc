@@ -58,7 +58,7 @@ module.exports = function (RED) {
         setMsgObject(data) {
             const msg = {topic: (this.name || this.deviceName)};
             if (this.state) {
-                if (Object.prototype.hasOwnProperty.call(data.state, this.state)) {
+                if (data.state && Object.prototype.hasOwnProperty.call(data.state, this.state)) {
                     msg.payload = this.convertState(data.state[this.state]);
                 } else {
                     return null;
