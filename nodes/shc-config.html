@@ -40,7 +40,7 @@
 
             if (!this.credentials.has_cert) {
                 RED.notify('Generating new client data. Please wait...');
-                $.getJSON('/shc/tls', {})
+                $.getJSON('shc/tls', {})
                     .done(data => {
                         RED.notify('Generated!');
                         $('#node-config-input-key').val(data.private);
@@ -50,7 +50,7 @@
                         RED.notify(err.responseText, 'error');
                     });
 
-                $.getJSON('/shc/id', {})
+                $.getJSON('shc/id', {})
                     .done(data => {
                         $('#node-config-input-clientid').val(data);
                     })
@@ -72,7 +72,7 @@
 
             function discoverShc(value) {
                 RED.notify('Searching SHCs in local network, please wait...', 'notice');
-                $.getJSON('/shc/discover', {})
+                $.getJSON('shc/discover', {})
                     .done(data => {
                         populate(data);
                         $(shcipBoxId).val(value);
@@ -120,7 +120,7 @@
                     if (state === 'PAIRED') {
                         RED.notify('Client already paired', 'notice');
                     } else {
-                        $.get('/shc/client', {shcip, clientid,
+                        $.get('shc/client', {shcip, clientid,
                             clientname, password, key, cert})
                             .done(data => {
                                 if (data === 'PAIRED') {
