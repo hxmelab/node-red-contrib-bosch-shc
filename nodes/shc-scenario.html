@@ -55,7 +55,7 @@
                 if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {
                     RED.notify('Requesting scenarios, please wait...', 'notice');
     
-                    $.getJSON('/shc/scenarios', {config: shcConfig.id})
+                    $.getJSON('shc/scenarios', {config: shcConfig.id})
                         .done(scenarios => {
                             populate(scenarios);
                             $(scenarioBoxId).val(value);

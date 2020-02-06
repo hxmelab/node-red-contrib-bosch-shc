@@ -123,9 +123,9 @@
 
                 if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {
                     RED.notify('Requesting devices, please wait...', 'notice');
-                    $.getJSON('/shc/devices', {config: shcConfig.id})
+                    $.getJSON('shc/devices', {config: shcConfig.id})
                         .done(devices => {
-                            $.getJSON('/shc/rooms', {config: shcConfig.id})
+                            $.getJSON('shc/rooms', {config: shcConfig.id})
                                 .done(rooms => {
                                     populate(rooms, devices);
                                 })
