@@ -98,7 +98,7 @@ module.exports = function (RED) {
             switch (this.serviceId) {
                 case 'SmokeDetectorCheck': return {'@type': 'smokeDetectorCheckState', value: 'SMOKE_TEST_REQUESTED'};
                 case 'PowerSwitch': return {'@type': 'powerSwitchState', switchState: (newState ? 'ON' : 'OFF')};
-                case 'RoomClimateControl': return {'@type': 'climateControlState', setpointTemperature: newState};
+                case 'RoomClimateControl': return {'@type': 'climateControlState', setpointTemperature: (newState  * 2).toFixed() / 2};
                 case 'PrivacyMode': return {'@type': 'privacyModeState', value: (newState ? 'DISABLED' : 'ENABLED')};
                 case 'IntrusionDetectionControl': return {'@type': 'intrusionDetectionControlState', value: (newState ? 'SYSTEM_ARMED' : 'SYSTEM_DISARMED')};
                 case 'PresenceSimulationConfiguration': return {'@type': 'presenceSimulationConfigurationState', enabled: newState};
