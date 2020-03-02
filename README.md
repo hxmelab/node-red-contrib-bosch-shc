@@ -77,8 +77,9 @@ If the **msg.payload** matches the predefined **type** and **range** of the **se
 | **SmokeDetectorCheck**              | boolean      | true, false    | Triggers a test alarm on this device |
 | **PowerSwitch**                     | boolean      | true, false    | Turn device on/off |
 | **PrivacyMode**                     | boolean      | true, false    | Activate/deactivate camera privacy mode |
-| **RoomClimateControl**                  | Number       | 5.0, 5.5, ..., 29.5, 30.0       | Set a room temperature |
-| **ShutterControl**                  | Number       | 0.000, 0.005, ..., 0.995, 1.000 | Set the level of a shutter |
+| **RoomClimateControl**              | number       | 5.0, 5.5, ..., 29.5, 30.0       | Set a room temperature |
+| **ShutterControl**                  | number       | 0.000, 0.005, ..., 0.995, 1.000 | Set the level of a shutter (0 = close) |
+|                                     | string | stop, close, open | Set the operation state of a shutter (case insensitive) |
 
 
 ## Scenario Node
