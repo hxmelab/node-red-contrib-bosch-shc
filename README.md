@@ -1,4 +1,11 @@
+
+[![NPM](https://nodei.co/npm/node-red-contrib-bosch-shc.png)](https://nodei.co/npm/node-red-contrib-bosch-shc/)
+
 # Bosch Smart Home Controller (SHC) nodes for Node-Red
+[![NPM version](https://badge.fury.io/js/node-red-contrib-bosch-shc.svg)](http://badge.fury.io/js/node-red-contrib-bosch-shc)
+[![Dependencies Status](https://david-dm.org/hxmelab/node-red-contrib-bosch-shc.svg)](https://david-dm.org/hxmelab/node-red-contrib-bosch-shc)
+[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/hxmelab/node-red-contrib-bosch-shc/blob/master/LICENSE)
 
 This module provides several nodes for interacting with Bosch Smart Home services and edge devices via the local controller API. A full documentation of the API can be found [here](https://apidocs.bosch-smarthome.com/local/).
 
@@ -68,6 +75,7 @@ To send only a value instead of the entire service object, enter the name of the
 ![State of a service](docs/device_conf_state.png)
 
 ### Set a state
+
 If the **msg.payload** matches the predefined **type** and **range** of the **service**, the associated state will be updated with the specified payload value. The following services can be updated:
 
 | Service                             | Payload Type | Payload Range | Information |
@@ -77,8 +85,9 @@ If the **msg.payload** matches the predefined **type** and **range** of the **se
 | **SmokeDetectorCheck**              | boolean      | true, false    | Triggers a test alarm on this device |
 | **PowerSwitch**                     | boolean      | true, false    | Turn device on/off |
 | **PrivacyMode**                     | boolean      | true, false    | Activate/deactivate camera privacy mode |
-| **RoomClimateControl**                  | Number       | 5.0, 5.5, ..., 29.5, 30.0       | Set a room temperature |
-| **ShutterControl**                  | Number       | 0.000, 0.005, ..., 0.995, 1.000 | Set the level of a shutter |
+| **RoomClimateControl**              | number       | 5.0, 5.5, ..., 29.5, 30.0       | Set a room temperature |
+| **ShutterControl**                  | number       | 0.000, 0.005, ..., 0.995, 1.000 | Set the level of a shutter (0 = close) |
+|                                     | string | stop, close, open | Set the operation state of a shutter (case insensitive) |
 
 
 ## Scenario Node

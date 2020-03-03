@@ -88,7 +88,7 @@ module.exports = function (RED) {
                 case 'PrivacyMode':
                 case 'IntrusionDetectionControl':
                 case 'PresenceSimulationConfiguration': return (typeof newState === 'boolean');
-                case 'ShutterControl': return (typeof newState === 'number' && newState >= 0 && newState <= 1);
+                case 'ShutterControl': return (typeof newState === 'number' && newState >= 0 && newState <= 1) || typeof newState === 'string';
                 case 'RoomClimateControl': return (typeof newState === 'number' && newState >= 5 && newState <= 30);
                 default: return false;
             }
@@ -98,11 +98,21 @@ module.exports = function (RED) {
             switch (this.serviceId) {
                 case 'SmokeDetectorCheck': return {'@type': 'smokeDetectorCheckState', value: 'SMOKE_TEST_REQUESTED'};
                 case 'PowerSwitch': return {'@type': 'powerSwitchState', switchState: (newState ? 'ON' : 'OFF')};
-                case 'RoomClimateControl': return {'@type': 'climateControlState', setpointTemperature: (newState  * 2).toFixed() / 2};
+                case 'RoomClimateControl': return {'@type': 'climateControlState', setpointTemperature: (newState * 2).toFixed() / 2};
                 case 'PrivacyMode': return {'@type': 'privacyModeState', value: (newState ? 'DISABLED' : 'ENABLED')};
                 case 'IntrusionDetectionControl': return {'@type': 'intrusionDetectionControlState', value: (newState ? 'SYSTEM_ARMED' : 'SYSTEM_DISARMED')};
                 case 'PresenceSimulationConfiguration': return {'@type': 'presenceSimulationConfigurationState', enabled: newState};
-                case 'ShutterControl': return {'@type': 'shutterControlState', level: newState};
+                case 'ShutterControl':
+                    if (typeof newState === 'string') {
+                        switch (newState.toUpperCase()) {
+                            case 'STOP': return {'@type': 'shutterControlState', operationState: 'STOPPED'};
+                            case 'OPEN': return {'@type': 'shutterControlState', level: 1};
+                            case 'CLOSE': return {'@type': 'shutterControlState', level: 0};
+                            default: return false;
+                        }
+                    }
+
+                    return {'@type': 'shutterControlState', level: newState};
                 default: return false;
             }
         }
