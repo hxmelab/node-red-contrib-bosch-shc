@@ -5,7 +5,8 @@
   "repository": "https://github.com/hxmelab/node-red-contrib-bosch-shc",
   "main": "none",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "postpublish": "git tag v$(jq -r '.version' package.json) && git push --no-verify --tags",
+    "test": "xo",
     "lintfix": "xo --fix",
     "linter": "xo"
   },
