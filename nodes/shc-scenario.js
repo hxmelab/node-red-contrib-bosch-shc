@@ -5,7 +5,8 @@ module.exports = function (RED) {
         constructor(config) {
             RED.nodes.createNode(this, config);
 
-            this.scenario = config.scenario.split('|')[1];
+            this.scenarioName = config.scenario.split('|')[0];
+            this.scenarioId = config.scenario.split('|')[1];
             this.name = config.name;
             this.shcConfig = RED.nodes.getNode(config.shc);
 
@@ -18,9 +19,9 @@ module.exports = function (RED) {
              * Any input msg triggers the configured scenario
              */
             this.on('input', (msg, send, done) => {
-                if (this.scenario && this.shcConfig && this.shcConfig.connected) {
+                if (this.scenarioId && this.shcConfig && this.shcConfig.connected) {
                     this.shcConfig.shc.getBshcClient()
-                        .triggerScenario(this.scenario).subscribe(() => {
+                        .triggerScenario(this.scenarioId).subscribe(() => {
                             done();
                         }, err => {
                             done(err);
@@ -29,7 +30,20 @@ module.exports = function (RED) {
             });
         }
 
-        listener() {}
+        setMsgObject(data) {
+            const msg = {topic: (this.name || this.scenarioName)};
+            msg.payload = data;
+            return msg.payload === null ? null : msg;
+        }
+
+        listener(data) {
+            const parsed = JSON.parse(JSON.stringify(data));
+            parsed.forEach(event => {
+                if (event.id && this.scenarioId === event.id) {
+                    this.send(this.setMsgObject(event));
+                }
+            });
+        }
     }
 
     RED.nodes.registerType('shc-scenario', SHCScenarioNode);
