@@ -89,6 +89,7 @@ module.exports = function (RED) {
                 case 'IntrusionDetectionControl':
                 case 'PresenceSimulationConfiguration': return (typeof newState === 'boolean');
                 case 'ShutterControl': return (typeof newState === 'number' && newState >= 0 && newState <= 1) || typeof newState === 'string';
+                case 'HeatingCircuit':
                 case 'RoomClimateControl': return (typeof newState === 'number' && newState >= 5 && newState <= 30);
                 default: return false;
             }
@@ -98,6 +99,7 @@ module.exports = function (RED) {
             switch (this.serviceId) {
                 case 'SmokeDetectorCheck': return {'@type': 'smokeDetectorCheckState', value: 'SMOKE_TEST_REQUESTED'};
                 case 'PowerSwitch': return {'@type': 'powerSwitchState', switchState: (newState ? 'ON' : 'OFF')};
+                case 'HeatingCircuit': return {'@type': 'heatingCircuitState', setpointTemperature: (newState * 2).toFixed() / 2};
                 case 'RoomClimateControl': return {'@type': 'climateControlState', setpointTemperature: (newState * 2).toFixed() / 2};
                 case 'PrivacyMode': return {'@type': 'privacyModeState', value: (newState ? 'DISABLED' : 'ENABLED')};
                 case 'IntrusionDetectionControl': return {'@type': 'intrusionDetectionControlState', value: (newState ? 'SYSTEM_ARMED' : 'SYSTEM_DISARMED')};
