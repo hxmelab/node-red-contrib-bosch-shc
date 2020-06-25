@@ -5,11 +5,17 @@ module.exports = function (RED) {
         constructor(config) {
             RED.nodes.createNode(this, config);
 
+            // In v0.3.22 introduced property, default true
+            if (typeof config.poll === 'undefined') {
+                config.poll = true;
+            }
+
             this.deviceName = config.device.split('|')[0];
             this.deviceId = config.device.split('|')[1];
             this.deviceModel = config.device.split('|')[2];
             this.serviceId = config.service;
             this.state = config.state;
+            this.poll = config.poll;
             this.name = config.name;
 
             this.shcConfig = RED.nodes.getNode(config.shc);
@@ -20,11 +26,12 @@ module.exports = function (RED) {
             }
 
             /**
-             *
+             *  Handle node input
              */
             this.on('input', (msg, send, done) => {
                 if (this.shcConfig && this.shcConfig.connected) {
-                    if (this.isValid(msg.payload) && this.getServiceBody(msg.payload)) {
+                    // Set a state on a single device service
+                    if (this.isValid(msg.payload) && this.serviceId && this.getServiceBody(msg.payload)) {
                         this.shcConfig.shc.getBshcClient().putState(this.getPath(),
                             this.getServiceBody(msg.payload)).subscribe(result => {
                             if (result._parsedResponse && result._parsedResponse.message) {
@@ -35,6 +42,28 @@ module.exports = function (RED) {
                         }, err => {
                             done(err);
                         });
+                        // Get all device services regardless of a device
+                    } else if (this.deviceId === 'all' && this.serviceId) {
+                        this.shcConfig.shc.getBshcClient()
+                            .getDeviceServices(undefined, undefined).subscribe(result => {
+                                send(this.setMsgArray(result._parsedResponse.filter(element => {
+                                    if (this.serviceId === 'all') {
+                                        return true;
+                                    }
+
+                                    return this.serviceId === element.id;
+                                }).map(element => {
+                                    if (this.setMsgObject(element)) {
+                                        return this.setMsgObject(element).payload;
+                                    }
+
+                                    return null;
+                                })));
+                                done();
+                            }, err => {
+                                done(err);
+                            });
+                        // Get one or all device services of a specific device
                     } else if (this.deviceId && this.serviceId) {
                         this.shcConfig.shc.getBshcClient()
                             .getDeviceServices(this.deviceId, this.serviceId).subscribe(result => {
@@ -50,14 +79,29 @@ module.exports = function (RED) {
                             }, err => {
                                 done(err);
                             });
+                        // Get the device meta data of a specific device or of all devices
+                    } else if (this.deviceId) {
+                        this.shcConfig.shc.getBshcClient()
+                            .getDevice(this.deviceId === 'all' ? undefined : this.deviceId).subscribe(result => {
+                                send(this.setMsgObject(result._parsedResponse));
+                                done();
+                            }, err => {
+                                done(err);
+                            });
                     }
                 }
             });
         }
 
+        setMsgArray(data) {
+            const msg = {topic: (this.name || this.serviceId)};
+            msg.payload = data;
+            return msg.payload === null ? null : msg;
+        }
+
         setMsgObject(data) {
             const msg = {topic: (this.name || this.deviceName)};
-            if (this.state) {
+            if (this.serviceId && this.state) {
                 if (data.state && Object.prototype.hasOwnProperty.call(data.state, this.state)) {
                     msg.payload = this.convertState(data.state[this.state]);
                 } else {
@@ -75,10 +119,12 @@ module.exports = function (RED) {
         }
 
         isRelevant(msg) {
-            return ((this.deviceId === 'all' && this.serviceId === 'all') ||
-                    (this.deviceId === 'all' && this.serviceId === msg.id) ||
-                    (this.deviceId === msg.deviceId && this.serviceId === 'all') ||
-                    (this.deviceId === msg.deviceId && this.serviceId === msg.id));
+            return ((msg['@type'] === 'DeviceServiceData' && this.deviceId === 'all' && this.serviceId === 'all') ||
+                    (msg['@type'] === 'device' && this.deviceId === 'all' && !this.serviceId) ||
+                    (msg['@type'] === 'DeviceServiceData' && this.deviceId === 'all' && this.serviceId === msg.id) ||
+                    (msg['@type'] === 'DeviceServiceData' && this.deviceId === msg.deviceId && this.serviceId === 'all') ||
+                    (msg['@type'] === 'device' && this.deviceId === msg.id && !this.serviceId) ||
+                    (msg['@type'] === 'DeviceServiceData' && this.deviceId === msg.deviceId && this.serviceId === msg.id));
         }
 
         isValid(newState) {
@@ -138,7 +184,7 @@ module.exports = function (RED) {
         listener(data) {
             const parsed = JSON.parse(JSON.stringify(data));
             parsed.forEach(event => {
-                if (event.state && this.isRelevant(event)) {
+                if (this.poll && this.isRelevant(event)) {
                     this.send(this.setMsgObject(event));
                 }
             });

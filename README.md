@@ -11,9 +11,15 @@
 
 This module provides several nodes for interacting with Bosch Smart Home services and edge devices via the local controller API. A full documentation of the API can be found [here](https://apidocs.bosch-smarthome.com/local/).
 
+Example flows can be found [here](https://flows.nodered.org/flow/01271a01a6b647b7b7cfda67c332cfbc).
+
 **Compatible with Node-RED version 1.0.0 or higher.**
 
 ### Release Notes
+
+Version **0.3.23** allows you to request the device meta data, e.g. availability status. Further more it is now possible to request all or a specific device service of all related devices at once. As a result you get an array to calculate e.g. the total power consumption of all smart plugs or the average temperature across all rooms.
+
+Some legacy code has been removed. **If you encounter any problem with your shc-config after the update, you probably have to recreate it to solve this problem.**
 
 With version **0.2.14** the **smart thermostat (TRV)** was introduced and optimizations were implemented that improves the interaction with the **Node-RED dashboard**: 
 - **msg.topic** now contains the name of a device, so that several devices can be separated in a **dashboard chart**. You are also free to configure **msg.topic** via the device property **name**.
