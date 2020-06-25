@@ -9,7 +9,9 @@
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/hxmelab/node-red-contrib-bosch-shc/blob/master/LICENSE)
 
-This module provides several nodes for interacting with Bosch Smart Home services and edge devices via the local controller API. A full documentation of the API can be found [here](https://apidocs.bosch-smarthome.com/local/).
+This module provides several nodes for interacting with Bosch Smart Home services and edge devices via the local controller API. 
+
+A full documentation of the API can be found [here](https://apidocs.bosch-smarthome.com/local/).
 
 Example flows can be found [here](https://flows.nodered.org/flow/01271a01a6b647b7b7cfda67c332cfbc).
 
