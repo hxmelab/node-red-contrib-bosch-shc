@@ -38,6 +38,7 @@
     "xo": "^0.32.0"
   },
   "xo": {
+    "nodeVersion": "12",
     "space": 4,
     "plugin": "html",
     "global": [
@@ -58,6 +59,7 @@
       "unicorn/prefer-string-slice": "warn",
       "valid-jsdoc": 0,
       "eslint-comments/no-unused-disable": 0,
+      "unicorn/prevent-abbreviations": 0,
       "promise/prefer-await-to-then": "warn",
       "prefer-object-spread": "warn",
       "no-unused-vars": [
