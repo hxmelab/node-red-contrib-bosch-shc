@@ -95,14 +95,14 @@ If the **msg.payload** matches the predefined **type** and **range** of the **se
 | **SmokeDetectorCheck**              | boolean      | true, false    | Triggers a test alarm on this device |
 | **PowerSwitch**                     | boolean      | true, false    | Turn device on/off |
 | **PrivacyMode**                     | boolean      | true, false    | Activate/deactivate camera privacy mode |
-| **RoomClimateControl**              | number       | 5.0, 5.5, ..., 29.5, 30.0       | Set a room temperature |
+| **HeatingCircuit**, **RoomClimateControl**              | number       | 5.0, 5.5, ..., 29.5, 30.0       | Set a temperature |
 | **ShutterControl**                  | number       | 0.000, 0.005, ..., 0.995, 1.000 | Set the level of a shutter (0 = close) |
 |                                     | string | stop, close, open | Set the operation state of a shutter (case insensitive) |
 
 
 ## Scenario Node
 
-Use this node to trigger the defined scenario. Each **msg** can be used as a trigger. This node sends a message when the defined scenario has been triggered.
+Use this node to trigger the defined scenario. Each **msg** can be used as a trigger. This node sends an event message when the defined scenario has been triggered.
 
 ![Scenario node](docs/scenario_node.png)
 
