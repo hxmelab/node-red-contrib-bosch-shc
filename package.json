@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-bosch-shc",
-  "version": "0.2.21",
+  "version": "0.3.22",
   "description": "Bosch Smart Home Controller (SHC) nodes for Node-Red",
   "repository": "https://github.com/hxmelab/node-red-contrib-bosch-shc",
   "main": "none",
@@ -30,14 +30,15 @@
     }
   },
   "dependencies": {
-    "bosch-smart-home-bridge": "0.2.7",
-    "node-dns-sd": "0.4.0"
+    "bosch-smart-home-bridge": "0.2.12",
+    "node-dns-sd": "0.4.1"
   },
   "devDependencies": {
     "eslint-plugin-html": "^6.0.2",
-    "xo": "^0.25.4"
+    "xo": "^0.32.0"
   },
   "xo": {
+    "nodeVersion": "12",
     "space": 4,
     "plugin": "html",
     "global": [
@@ -58,6 +59,7 @@
       "unicorn/prefer-string-slice": "warn",
       "valid-jsdoc": 0,
       "eslint-comments/no-unused-disable": 0,
+      "unicorn/prevent-abbreviations": 0,
       "promise/prefer-await-to-then": "warn",
       "prefer-object-spread": "warn",
       "no-unused-vars": [

@@ -8,13 +8,15 @@
                 type: 'shc-config',
                 required: true
             },
+            poll: {
+                value: true
+            },
             device: {
                 value: '',
                 required: true
             },
             service: {
-                value: 'all',
-                required: true
+                value: ''
             },
             state: {
                 value: ''
@@ -31,6 +33,16 @@
         },
         paletteLabel: 'device',
         oneditprepare() {
+            const supportedDevices = 'CAMERA_360, CAMERA_EYES, BBL, BSM, ' +
+                            'INTRUSION_DETECTION_SYSTEM, MD, PSM, PRESENCE_SIMULATION_SERVICE, ' +
+                            'ROOM_CLIMATE_CONTROL, SD, SWD, TWINGUARD, WRC2, TRV, THB, BWTH, ' +
+                            'LOGAMATIC_WEB_KM200, HEATING_CIRCUIT';
+            const supportedServices = 'AirQualityLevel,BatteryLevel,HumidityLevel,' +
+                            'IntrusionDetectionControl,Keypad,LatestMotion,' +
+                            'PowerMeter,PowerSwitch,PresenceSimulationConfiguration,' +
+                            'PrivacyMode,RoomClimateControl,ShutterContact, ' +
+                            'ShutterControl, SmokeDetectorCheck,TemperatureLevel,ValveTappet';
+
             const deviceBoxId = '#node-input-device';
             const deviceBoxText = '<input type="text" id="node-input-device" placeholder="Select a device" style="width: 100%;">';
             const deviceBoxSelect = '<select id="node-input-device" style="width: 100%;" />';
@@ -40,14 +52,11 @@
                 const selectDevice = $('#node-input-device');
 
                 function format(device) {
-                    let services = '';
-                    for (let i = 0; i < device.deviceServiceIds.length; i++) {
-                        if (i === 0) {
-                            services = device.deviceServiceIds[i];
-                        } else {
-                            services = services + ',' + device.deviceServiceIds[i];
-                        }
-                    }
+                    const services = device.deviceServiceIds.filter(element => {
+                        return supportedServices.includes(element);
+                    }).reduce((acc, element) => {
+                        return acc + ',' + element;
+                    });
 
                     return $('<option/>')
                         .val(device.name + '|' + device.id + '|' + device.deviceModel + '|' + services)
@@ -65,10 +74,6 @@
                 }
     
                 function isSupported(model) {
-                    const supportedDevices = 'CAMERA_360, CAMERA_EYES, BBL, BSM, ' +
-                            'INTRUSION_DETECTION_SYSTEM, MD, PSM, PRESENCE_SIMULATION_SERVICE, ' +
-                            'ROOM_CLIMATE_CONTROL, SD, SWD, TWINGUARD, WRC2, TRV, THB, BWTH, ' +
-                            'LOGAMATIC_WEB_KM200, HEATING_CIRCUIT';
                     return (supportedDevices.includes(model));
                 }
 
@@ -94,6 +99,14 @@
 
                 function populate(rooms, devices) {
                     if (devices.length > 0 && rooms.length > 0) {
+                        const optGroup = $('<optgroup label="Devices"></optgroup>');
+                        selectDevice.append(optGroup);
+                        optGroup.append($('<option/>')
+                            .val('all|all|all|' + supportedServices)
+                            .text('All Devices'));
+
+                        // Service in this context means e.g. alarm system, presence simulation,
+                        // which is typically not assign to a specific room
                         const serviceList = filterUndefinedRoom(devices);
                         if (serviceList.length > 0) {
                             const serviceGroup = $('<optgroup label="Without Room"></optgroup>');
@@ -108,22 +121,22 @@
                             const roomName = getRoomName(element.id, rooms);
                             const deviceList = filterDevices(element.id, devices);
 
-                            const optGroup = $('<optgroup label="' + roomName + '"></optgroup>');
-                            selectDevice.append(optGroup);
+                            const roomGroup = $('<optgroup label="' + roomName + '"></optgroup>');
+                            selectDevice.append(roomGroup);
                             deviceList.reduce((parent, device) => {
                                 parent.append(format(device));
                                 return parent;
-                            }, optGroup);
+                            }, roomGroup);
                         }, this);
 
                         RED.notify('Got it, please select a device', 'notice');
                     } else {
-                        RED.notify('No device found', 'notice');
+                        RED.notify('No device or no room found', 'notice');
                     }
                 }
 
                 if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {
-                    RED.notify('Requesting devices, please wait...', 'notice');
+                    RED.notify('Getting devices and rooms, please wait...', 'notice');
                     $.getJSON('shc/devices', {config: shcConfig.id})
                         .done(devices => {
                             $.getJSON('shc/rooms', {config: shcConfig.id})
@@ -158,19 +171,19 @@
             });
 
             const serviceBoxId = '#node-input-service';
-            const serviceBoxText = '<input type="text" id="node-input-service" placeholder="all" style="width: 100%;">';
+            const serviceBoxText = '<input type="text" id="node-input-service" placeholder="Leave empty for device meta data" style="width: 100%;">';
             const serviceBoxSelect = '<select id="node-input-service" style="width: 100%;" />';
 
             function lookupServices(sVal, dVal) {
                 if (dVal) {
                     const selectService = $('#node-input-service');
-                    const optGroup = $('<optgroup label="Services"></optgroup>');
-                    selectService.append(optGroup);
 
+                    const optGroup = $('<optgroup label="Device Services"></optgroup>');
+                    selectService.append(optGroup);
+                    optGroup.append($('<option/>').val('all').text('All Device Services'));
                     const sList = dVal.split('|')[3].split(',');
-                    selectService.append($('<option/>').val('all').text('all'));
                     sList.forEach(element => {
-                        selectService.append($('<option/>').val(element).text(element));
+                        optGroup.append($('<option/>').val(element).text(element));
                     });
                 }
             }
@@ -199,6 +212,16 @@
         <input type="text" id="node-input-shc">
     </div>
 
+    <div class="form-row">
+        <label for="node-input-poll"><i class="fa fa-feed"></i> Event</label>
+        <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+            <div style="position: absolute; left: 0px;">
+                <input type="checkbox" id="node-input-poll" checked>
+            </div>
+            <div style="position: relative; left: 20px; top: 3px;">Poll events from SHC</div>
+        </div>
+    </div>
+
     <div class="form-row" style="white-space: nowrap;">
         <label for="node-input-device"><i class="fa fa-power-off"></i> Device</label>
         <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
@@ -215,7 +238,7 @@
         <label for="node-input-service"><i class="fa fa-cog"></i> Service</label>
         <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
           <div style="position: absolute; left: 0px; right: 40px;">
-            <input type="text" id="node-input-service" placeholder="No service specified" style="width: 100%;" />
+            <input type="text" id="node-input-service" placeholder="Leave empty for device meta data" style="width: 100%;" />
           </div>
           <a id="node-input-lookup-service" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
             <i class="fa fa-search"></i>
@@ -231,6 +254,11 @@
     <div class="form-row">
         <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+
+    <div class="form-tips"><b>Hint:</b> <a href="https://github.com/hxmelab/node-red-contrib-bosch-shc#requesting"> Requesting a device</a>, 
+        in particular all devices, should be done sparingly 
+        (see <a href="https://github.com/BoschSmartHome/bosch-shc-api-docs/tree/master/best_practice#limit-the-number-of-requests-in-a-given-time-period">Bosch Smart Home Local API Documentation</a>).
     </div>
 </script>
 

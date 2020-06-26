@@ -25,23 +25,12 @@ module.exports = function (RED) {
             this.on('close', this.destructor);
 
             if (this.state === 'PAIRED') {
-                // try-block is legacy and will be removed in future. Users with old configurations need to recreate them when try-block is removed.
-                try {
-                    this.shc = new BoschSmartHomeBridgeBuilder.builder()
-                        .withHost(this.shcip)
-                        .withClientCert(JSON.parse(this.cert))
-                        .withClientPrivateKey(JSON.parse(this.key))
-                        .withLogger(new ShcLogger())
-                        .build();
-                    this.warn('Please create a new SHC Configuration (shc-config) with IP ' + this.shcip + ' and delete this one. The version of this Configuration will expire soon.');
-                } catch (_error) {
-                    this.shc = new BoschSmartHomeBridgeBuilder.builder()
-                        .withHost(this.shcip)
-                        .withClientCert(this.cert)
-                        .withClientPrivateKey(this.key)
-                        .withLogger(new ShcLogger())
-                        .build();
-                }
+                this.shc = new BoschSmartHomeBridgeBuilder.builder()
+                    .withHost(this.shcip)
+                    .withClientCert(this.cert)
+                    .withClientPrivateKey(this.key)
+                    .withLogger(new ShcLogger())
+                    .build();
 
                 this.shc.getBshcClient().getInformation().subscribe(() => {
                     this.connected = true;
@@ -236,23 +225,12 @@ module.exports = function (RED) {
             return;
         }
 
-        let shc;
-        // try-block is legacy and will be removed in future. Users with old configurations need to recreate them when try-block is removed.
-        try {
-            shc = new BoschSmartHomeBridgeBuilder.builder()
-                .withHost(configNode.shcip)
-                .withClientCert(JSON.parse(configNode.credentials.cert))
-                .withClientPrivateKey(JSON.parse(configNode.credentials.key))
-                .withLogger(new ShcLogger())
-                .build();
-        } catch (_error) {
-            shc = new BoschSmartHomeBridgeBuilder.builder()
-                .withHost(configNode.shcip)
-                .withClientCert(configNode.credentials.cert)
-                .withClientPrivateKey(configNode.credentials.key)
-                .withLogger(new ShcLogger())
-                .build();
-        }
+        const shc = new BoschSmartHomeBridgeBuilder.builder()
+            .withHost(configNode.shcip)
+            .withClientCert(configNode.credentials.cert)
+            .withClientPrivateKey(configNode.credentials.key)
+            .withLogger(new ShcLogger())
+            .build();
 
         shc.getBshcClient().getScenarios().subscribe(res => {
             if (res && res._parsedResponse) {
@@ -275,23 +253,12 @@ module.exports = function (RED) {
             return;
         }
 
-        let shc;
-        // try-block is legacy and will be removed in future. Users with old configurations need to recreate them when try-block is removed.
-        try {
-            shc = new BoschSmartHomeBridgeBuilder.builder()
-                .withHost(configNode.shcip)
-                .withClientCert(JSON.parse(configNode.credentials.cert))
-                .withClientPrivateKey(JSON.parse(configNode.credentials.key))
-                .withLogger(new ShcLogger())
-                .build();
-        } catch (_error) {
-            shc = new BoschSmartHomeBridgeBuilder.builder()
-                .withHost(configNode.shcip)
-                .withClientCert(configNode.credentials.cert)
-                .withClientPrivateKey(configNode.credentials.key)
-                .withLogger(new ShcLogger())
-                .build();
-        }
+        const shc = new BoschSmartHomeBridgeBuilder.builder()
+            .withHost(configNode.shcip)
+            .withClientCert(configNode.credentials.cert)
+            .withClientPrivateKey(configNode.credentials.key)
+            .withLogger(new ShcLogger())
+            .build();
 
         shc.getBshcClient().getRooms().subscribe(res => {
             if (res && res._parsedResponse) {
@@ -314,23 +281,12 @@ module.exports = function (RED) {
             return;
         }
 
-        let shc;
-        // try-block is legacy and will be removed in future. Users with old configurations need to recreate them when try-block is removed.
-        try {
-            shc = new BoschSmartHomeBridgeBuilder.builder()
-                .withHost(configNode.shcip)
-                .withClientCert(JSON.parse(configNode.credentials.cert))
-                .withClientPrivateKey(JSON.parse(configNode.credentials.key))
-                .withLogger(new ShcLogger())
-                .build();
-        } catch (_error) {
-            shc = new BoschSmartHomeBridgeBuilder.builder()
-                .withHost(configNode.shcip)
-                .withClientCert(configNode.credentials.cert)
-                .withClientPrivateKey(configNode.credentials.key)
-                .withLogger(new ShcLogger())
-                .build();
-        }
+        const shc = new BoschSmartHomeBridgeBuilder.builder()
+            .withHost(configNode.shcip)
+            .withClientCert(configNode.credentials.cert)
+            .withClientPrivateKey(configNode.credentials.key)
+            .withLogger(new ShcLogger())
+            .build();
 
         shc.getBshcClient().getDevices().subscribe(res => {
             if (res && res._parsedResponse) {
@@ -353,23 +309,12 @@ module.exports = function (RED) {
             return;
         }
 
-        let shc;
-        // try-block is legacy and will be removed in future. Users with old configurations need to recreate them when try-block is removed.
-        try {
-            shc = new BoschSmartHomeBridgeBuilder.builder()
-                .withHost(configNode.shcip)
-                .withClientCert(JSON.parse(configNode.credentials.cert))
-                .withClientPrivateKey(JSON.parse(configNode.credentials.key))
-                .withLogger(new ShcLogger())
-                .build();
-        } catch (_error) {
-            shc = new BoschSmartHomeBridgeBuilder.builder()
-                .withHost(configNode.shcip)
-                .withClientCert(configNode.credentials.cert)
-                .withClientPrivateKey(configNode.credentials.key)
-                .withLogger(new ShcLogger())
-                .build();
-        }
+        const shc = new BoschSmartHomeBridgeBuilder.builder()
+            .withHost(configNode.shcip)
+            .withClientCert(configNode.credentials.cert)
+            .withClientPrivateKey(configNode.credentials.key)
+            .withLogger(new ShcLogger())
+            .build();
 
         shc.getBshcClient().getDeviceServices().subscribe(res => {
             if (res && res._parsedResponse) {

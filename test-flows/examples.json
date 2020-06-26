@@ -1,0 +1,1151 @@
+[
+    {
+        "id": "8e3172ca.6fe9f",
+        "type": "shc-device",
+        "z": "10501378.41c385",
+        "shc": "",
+        "poll": true,
+        "device": "-RoomClimateControl-|roomClimateControl_hz_6|ROOM_CLIMATE_CONTROL|RoomClimateControl,TemperatureLevel",
+        "service": "RoomClimateControl",
+        "state": "setpointTemperature",
+        "name": "",
+        "x": 380,
+        "y": 1280,
+        "wires": [
+            [
+                "fe73091d.b63de8",
+                "5a139103.03e65"
+            ]
+        ]
+    },
+    {
+        "id": "fe73091d.b63de8",
+        "type": "ui_slider",
+        "z": "10501378.41c385",
+        "name": "",
+        "label": "Room",
+        "tooltip": "",
+        "group": "63223d46.8c561c",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "outs": "end",
+        "topic": "",
+        "min": "5",
+        "max": "30",
+        "step": "0.5",
+        "x": 370,
+        "y": 1360,
+        "wires": [
+            [
+                "8e3172ca.6fe9f"
+            ]
+        ]
+    },
+    {
+        "id": "bdac975.d01ace8",
+        "type": "shc-device",
+        "z": "10501378.41c385",
+        "shc": "",
+        "poll": true,
+        "device": "TestPlug|hdm:HomeMaticIP:3014F711A0000496D858AC55|PSM|PowerMeter,PowerSwitch",
+        "service": "PowerSwitch",
+        "state": "switchState",
+        "name": "",
+        "x": 340,
+        "y": 780,
+        "wires": [
+            [
+                "9b1db41f.dea588",
+                "58f25f91.ceca58"
+            ]
+        ]
+    },
+    {
+        "id": "9b1db41f.dea588",
+        "type": "ui_switch",
+        "z": "10501378.41c385",
+        "name": "",
+        "label": "",
+        "tooltip": "",
+        "group": "1e44a4a9.7e157b",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 330,
+        "y": 860,
+        "wires": [
+            [
+                "bdac975.d01ace8"
+            ]
+        ]
+    },
+    {
+        "id": "4bf7edf0.6ab03c",
+        "type": "ui_button",
+        "z": "10501378.41c385",
+        "name": "",
+        "group": "5faf56e2.bac2c",
+        "order": 4,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Trigger Szenario",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "topic": "",
+        "x": 160,
+        "y": 1100,
+        "wires": [
+            [
+                "80e274fb.55da2"
+            ]
+        ]
+    },
+    {
+        "id": "80e274fb.55da2",
+        "type": "shc-scenario",
+        "z": "10501378.41c385",
+        "shc": "",
+        "scenario": "TestScenario|3858f62c-9504-4c93-8b58-809b9c5c209a",
+        "name": "Scenario",
+        "x": 360,
+        "y": 1100,
+        "wires": [
+            [
+                "e4c01c7c.579f"
+            ]
+        ]
+    },
+    {
+        "id": "ae59beee.4167",
+        "type": "shc-fault",
+        "z": "10501378.41c385",
+        "shc": "",
+        "name": "",
+        "debug": true,
+        "x": 320,
+        "y": 80,
+        "wires": [
+            [
+                "f323a847.a93e68"
+            ]
+        ]
+    },
+    {
+        "id": "f323a847.a93e68",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "All messages",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 480,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "cf11f343.f59cd",
+        "type": "shc-fault",
+        "z": "10501378.41c385",
+        "shc": "",
+        "name": "",
+        "debug": false,
+        "x": 320,
+        "y": 140,
+        "wires": [
+            [
+                "719a40.407f3dc"
+            ]
+        ]
+    },
+    {
+        "id": "719a40.407f3dc",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "Faults only",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 480,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "95334179.b0a698",
+        "type": "shc-device",
+        "z": "10501378.41c385",
+        "shc": "",
+        "poll": true,
+        "device": "-PresenceSimulationService-|presenceSimulationService|PRESENCE_SIMULATION_SERVICE|PresenceSimulationScheduling,PresenceSimulationConfiguration",
+        "service": "PresenceSimulationConfiguration",
+        "state": "enabled",
+        "name": "",
+        "x": 400,
+        "y": 920,
+        "wires": [
+            [
+                "73195ddc.55ddf4",
+                "b3749d29.9c1d38"
+            ]
+        ]
+    },
+    {
+        "id": "73195ddc.55ddf4",
+        "type": "ui_switch",
+        "z": "10501378.41c385",
+        "name": "",
+        "label": "",
+        "tooltip": "",
+        "group": "ad44dcb3.6fb6d",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "decouple": "false",
+        "topic": "",
+        "style": "",
+        "onvalue": "true",
+        "onvalueType": "bool",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "false",
+        "offvalueType": "bool",
+        "officon": "",
+        "offcolor": "",
+        "x": 350,
+        "y": 980,
+        "wires": [
+            [
+                "95334179.b0a698"
+            ]
+        ]
+    },
+    {
+        "id": "224e315e.a15ace",
+        "type": "shc-device",
+        "z": "10501378.41c385",
+        "shc": "",
+        "poll": true,
+        "device": "Air|hdm:ZigBee:000d6f000e31309b|TWINGUARD|BatteryLevel,AirQualityLevel,SmokeDetectorCheck",
+        "service": "AirQualityLevel",
+        "state": "purity",
+        "name": "Air Purity ppm",
+        "x": 360,
+        "y": 1180,
+        "wires": [
+            [
+                "c0f7e11c.2f6998"
+            ]
+        ]
+    },
+    {
+        "id": "c0f7e11c.2f6998",
+        "type": "ui_chart",
+        "z": "10501378.41c385",
+        "name": "",
+        "group": "bd2539f3.63c2a8",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "Twinguard",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "useOldStyle": false,
+        "outputs": 1,
+        "x": 550,
+        "y": 1180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e4c01c7c.579f",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "Scenario event",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 540,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "425d6e2f.6fa8b",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 160,
+        "y": 1060,
+        "wires": [
+            [
+                "80e274fb.55da2"
+            ]
+        ]
+    },
+    {
+        "id": "af1f2063.633d58",
+        "type": "shc-device",
+        "z": "10501378.41c385",
+        "shc": "",
+        "poll": false,
+        "device": "all|all|all|AirQualityLevel,BatteryLevel,HumidityLevel,IntrusionDetectionControl,Keypad,LatestMotion,PowerMeter,PowerSwitch,PresenceSimulationConfiguration,PrivacyMode,RoomClimateControl,ShutterContact, ShutterControl, SmokeDetectorCheck,TemperatureLevel,ValveTappet",
+        "service": "all",
+        "state": "",
+        "name": "Service List",
+        "x": 350,
+        "y": 320,
+        "wires": [
+            [
+                "b5e0b31e.730d3"
+            ]
+        ]
+    },
+    {
+        "id": "16100206.1eaa56",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 140,
+        "y": 260,
+        "wires": [
+            [
+                "9c3652c6.d351a"
+            ]
+        ]
+    },
+    {
+        "id": "b8465b48.e966e",
+        "type": "shc-device",
+        "z": "10501378.41c385",
+        "shc": "",
+        "poll": false,
+        "device": "TestPlug|hdm:HomeMaticIP:3014F711A0000496D858AC55|PSM|PowerMeter,PowerSwitch",
+        "service": "all",
+        "state": "",
+        "name": "All services of a device",
+        "x": 380,
+        "y": 560,
+        "wires": [
+            [
+                "46634187.06d43"
+            ]
+        ]
+    },
+    {
+        "id": "9c3652c6.d351a",
+        "type": "shc-device",
+        "z": "10501378.41c385",
+        "shc": "",
+        "poll": false,
+        "device": "all|all|all|AirQualityLevel,BatteryLevel,HumidityLevel,IntrusionDetectionControl,Keypad,LatestMotion,PowerMeter,PowerSwitch,PresenceSimulationConfiguration,PrivacyMode,RoomClimateControl,ShutterContact, ShutterControl, SmokeDetectorCheck,TemperatureLevel,ValveTappet",
+        "service": "",
+        "state": "",
+        "name": "Device List",
+        "x": 350,
+        "y": 260,
+        "wires": [
+            [
+                "f445c7a0.0c03c"
+            ]
+        ]
+    },
+    {
+        "id": "faf5ca7d.3f06",
+        "type": "function",
+        "z": "10501378.41c385",
+        "name": "Sum",
+        "func": "if (Array.isArray(msg.payload)) {\n    msg.topic = 'Total power consumption'\n    msg.payload = msg.payload.reduce((acc, element) => {\n        return acc + element;\n    }, 0);\n    return msg;\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 410,
+        "y": 500,
+        "wires": [
+            [
+                "e53281e7.275d68"
+            ]
+        ]
+    },
+    {
+        "id": "f445c7a0.0c03c",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 550,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "b5e0b31e.730d3",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 550,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "71d8b358.9b0bbc",
+        "type": "shc-device",
+        "z": "10501378.41c385",
+        "shc": "",
+        "poll": false,
+        "device": "all|all|all|AirQualityLevel,BatteryLevel,HumidityLevel,IntrusionDetectionControl,Keypad,LatestMotion,PowerMeter,PowerSwitch,PresenceSimulationConfiguration,PrivacyMode,RoomClimateControl,ShutterContact, ShutterControl, SmokeDetectorCheck,TemperatureLevel,ValveTappet",
+        "service": "PowerMeter",
+        "state": "",
+        "name": "All PowerMeters",
+        "x": 360,
+        "y": 380,
+        "wires": [
+            [
+                "4bd504c3.0748ac"
+            ]
+        ]
+    },
+    {
+        "id": "4bd504c3.0748ac",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 550,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "a88dc763.8f75c",
+        "type": "shc-device",
+        "z": "10501378.41c385",
+        "shc": "",
+        "poll": false,
+        "device": "all|all|all|AirQualityLevel,BatteryLevel,HumidityLevel,IntrusionDetectionControl,Keypad,LatestMotion,PowerMeter,PowerSwitch,PresenceSimulationConfiguration,PrivacyMode,RoomClimateControl,ShutterContact, ShutterControl, SmokeDetectorCheck,TemperatureLevel,ValveTappet",
+        "service": "PowerMeter",
+        "state": "powerConsumption",
+        "name": "All powerConsumptions",
+        "x": 390,
+        "y": 440,
+        "wires": [
+            [
+                "bf4077c0.92e94",
+                "faf5ca7d.3f06"
+            ]
+        ]
+    },
+    {
+        "id": "bf4077c0.92e94",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 590,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "e53281e7.275d68",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 570,
+        "y": 500,
+        "wires": []
+    },
+    {
+        "id": "46634187.06d43",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 590,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "50ca9339.639eac",
+        "type": "shc-device",
+        "z": "10501378.41c385",
+        "shc": "",
+        "poll": true,
+        "device": "TestPlug|hdm:HomeMaticIP:3014F711A0000496D858AC55|PSM|PowerMeter,PowerSwitch",
+        "service": "PowerSwitch",
+        "state": "",
+        "name": "Specific device service",
+        "x": 380,
+        "y": 640,
+        "wires": [
+            [
+                "50337531.99e9dc"
+            ]
+        ]
+    },
+    {
+        "id": "c74ad393.dfe988",
+        "type": "shc-device",
+        "z": "10501378.41c385",
+        "shc": "",
+        "poll": true,
+        "device": "TestPlug|hdm:HomeMaticIP:3014F711A0000496D858AC55|PSM|PowerMeter,PowerSwitch",
+        "service": "PowerSwitch",
+        "state": "switchState",
+        "name": "Specific state of a device",
+        "x": 390,
+        "y": 700,
+        "wires": [
+            [
+                "a407ef1c.c29bb"
+            ]
+        ]
+    },
+    {
+        "id": "50337531.99e9dc",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 590,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "a407ef1c.c29bb",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 590,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "74bce0a8.56b6f",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 140,
+        "y": 320,
+        "wires": [
+            [
+                "af1f2063.633d58"
+            ]
+        ]
+    },
+    {
+        "id": "e64fc1c.773dc4",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 140,
+        "y": 380,
+        "wires": [
+            [
+                "71d8b358.9b0bbc"
+            ]
+        ]
+    },
+    {
+        "id": "3d789fbb.29acb8",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 140,
+        "y": 440,
+        "wires": [
+            [
+                "a88dc763.8f75c"
+            ]
+        ]
+    },
+    {
+        "id": "5f3040b3.cf476",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 140,
+        "y": 560,
+        "wires": [
+            [
+                "b8465b48.e966e"
+            ]
+        ]
+    },
+    {
+        "id": "c40559df.c07108",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 140,
+        "y": 640,
+        "wires": [
+            [
+                "50ca9339.639eac"
+            ]
+        ]
+    },
+    {
+        "id": "ba220c99.37d238",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 140,
+        "y": 700,
+        "wires": [
+            [
+                "c74ad393.dfe988"
+            ]
+        ]
+    },
+    {
+        "id": "f8bfbe82.dc904",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 150,
+        "y": 760,
+        "wires": [
+            [
+                "bdac975.d01ace8"
+            ]
+        ]
+    },
+    {
+        "id": "fafa9dae.ce5558",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 150,
+        "y": 800,
+        "wires": [
+            [
+                "bdac975.d01ace8"
+            ]
+        ]
+    },
+    {
+        "id": "58f25f91.ceca58",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 530,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "3ef4c030.c6034",
+        "type": "link out",
+        "z": "10501378.41c385",
+        "name": "Keypad Upper Short",
+        "links": [],
+        "x": 755,
+        "y": 1440,
+        "wires": []
+    },
+    {
+        "id": "e6992c60.a121c8",
+        "type": "link out",
+        "z": "10501378.41c385",
+        "name": "Keypad Upper Long",
+        "links": [],
+        "x": 755,
+        "y": 1480,
+        "wires": []
+    },
+    {
+        "id": "c2af8fdb.ab75a8",
+        "type": "switch",
+        "z": "10501378.41c385",
+        "name": "Upper/Lower",
+        "property": "payload.state.keyName",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "UPPER_BUTTON",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "LOWER_BUTTON",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 485,
+        "y": 1480,
+        "wires": [
+            [
+                "2d783372.017e2c"
+            ],
+            [
+                "393c0017.eedfa8"
+            ]
+        ]
+    },
+    {
+        "id": "2d783372.017e2c",
+        "type": "switch",
+        "z": "10501378.41c385",
+        "name": "Short/Long",
+        "property": "payload.state.eventType",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "PRESS_SHORT",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "PRESS_LONG",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 645,
+        "y": 1460,
+        "wires": [
+            [
+                "3ef4c030.c6034"
+            ],
+            [
+                "e6992c60.a121c8"
+            ]
+        ]
+    },
+    {
+        "id": "393c0017.eedfa8",
+        "type": "switch",
+        "z": "10501378.41c385",
+        "name": "Short/Long",
+        "property": "payload.state.eventType",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "PRESS_SHORT",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "PRESS_LONG",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 645,
+        "y": 1500,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "6d24070.ef11bf8",
+        "type": "shc-device",
+        "z": "10501378.41c385",
+        "shc": "",
+        "poll": true,
+        "device": "Keypad|hdm:HomeMaticIP:3014F711A0001596D8599A58|WRC2|BatteryLevel,Keypad",
+        "service": "Keypad",
+        "state": "",
+        "name": "",
+        "x": 280,
+        "y": 1480,
+        "wires": [
+            [
+                "c2af8fdb.ab75a8",
+                "63020ec3.4fc6b"
+            ]
+        ]
+    },
+    {
+        "id": "2d01c15d.57a8f6",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 150,
+        "y": 900,
+        "wires": [
+            [
+                "95334179.b0a698"
+            ]
+        ]
+    },
+    {
+        "id": "d9036835.fc8228",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "false",
+        "payloadType": "bool",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 150,
+        "y": 940,
+        "wires": [
+            [
+                "95334179.b0a698"
+            ]
+        ]
+    },
+    {
+        "id": "b3749d29.9c1d38",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 650,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "d66b3afd.d8547",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 160,
+        "y": 1180,
+        "wires": [
+            [
+                "224e315e.a15ace"
+            ]
+        ]
+    },
+    {
+        "id": "5a139103.03e65",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 590,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "df39843.d08d1f8",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "5",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 130,
+        "y": 1280,
+        "wires": [
+            [
+                "8e3172ca.6fe9f"
+            ]
+        ]
+    },
+    {
+        "id": "36c72c82.ff17a4",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "18.5",
+        "payloadType": "num",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 130,
+        "y": 1340,
+        "wires": [
+            [
+                "8e3172ca.6fe9f"
+            ]
+        ]
+    },
+    {
+        "id": "b96e634.5eccba",
+        "type": "inject",
+        "z": "10501378.41c385",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "x": 120,
+        "y": 1480,
+        "wires": [
+            [
+                "6d24070.ef11bf8"
+            ]
+        ]
+    },
+    {
+        "id": "63020ec3.4fc6b",
+        "type": "debug",
+        "z": "10501378.41c385",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 490,
+        "y": 1540,
+        "wires": []
+    },
+    {
+        "id": "63223d46.8c561c",
+        "type": "ui_group",
+        "z": "",
+        "name": "Temparature",
+        "tab": "35b64c76.37ce1c",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "1e44a4a9.7e157b",
+        "type": "ui_group",
+        "z": "",
+        "name": "Smart Plug",
+        "tab": "35b64c76.37ce1c",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "5faf56e2.bac2c",
+        "type": "ui_group",
+        "z": "",
+        "name": "Szenario",
+        "tab": "35b64c76.37ce1c",
+        "order": 3,
+        "disp": true,
+        "width": "8",
+        "collapse": false
+    },
+    {
+        "id": "ad44dcb3.6fb6d",
+        "type": "ui_group",
+        "z": "",
+        "name": "Presence Simulation",
+        "tab": "35b64c76.37ce1c",
+        "order": 4,
+        "disp": true,
+        "width": "8",
+        "collapse": false
+    },
+    {
+        "id": "bd2539f3.63c2a8",
+        "type": "ui_group",
+        "z": "",
+        "name": "Chart",
+        "tab": "35b64c76.37ce1c",
+        "order": 5,
+        "disp": true,
+        "width": "8",
+        "collapse": false
+    },
+    {
+        "id": "35b64c76.37ce1c",
+        "type": "ui_tab",
+        "z": "",
+        "name": "Example",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
