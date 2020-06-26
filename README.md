@@ -19,7 +19,7 @@ Example flows can be found [here](https://flows.nodered.org/flow/01271a01a6b647b
 
 ### Release Notes
 
-Version **0.3.22** allows you to request the device meta data, e.g. the availability status. In addition, it is now possible to request all device services or a specific state across all related devices at once. The result is an array that you can use, for example, to calculate the total power consumption of all smart plugs or the average temperature across all rooms.
+Version **0.3.22** allows you to request the device meta data, e.g. the availability status of a device. In addition, it is now possible to request all device services or a specific state across all related devices at once. The result is an array that you can use, for example, to calculate the total power consumption of all smart plugs or the average temperature across all rooms.
 
 Some legacy code has been removed. **If you encounter any problem with your shc-config after the update to version 0.3.22, you will probably need to recreate it to solve this problem.**
 
@@ -66,7 +66,7 @@ To request a device any **msg** can be used, if the **msg.payload** does not mat
 
 ### Get all services of a device
 
-To send all related services of a device, select a **Device** and select **all** as a **Service**. The **State** input field can be left empty. The **msg.payload** contains a JSON array with all related services, if you request it. If received via long polling, a single JSON service object is sent.
+To send all related services of a device, select a **Device** and select **all** as a **Service**. The **State** input field can be left empty. This node sends a message when one of the device services has been updated.
 
 ![All services](docs/device_conf_all.png)
 
@@ -80,7 +80,7 @@ Select a **Service** to send only JSON objects of the specified service. Request
 
 ### Get a state
 
-To send only a value instead of the entire service object, enter the name of the **State** in the corresponding field. The **service object** is sent from the node if the state does not exist or is not related to the service.
+If you only need a value instead of the entire service object, enter the name of the **State** in the corresponding field. No **msg** is sent from the node if the state does not exist or is not related to the service.
 
 ![State of a service](docs/device_conf_state.png)
 
