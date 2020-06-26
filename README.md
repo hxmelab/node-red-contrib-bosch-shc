@@ -19,9 +19,9 @@ Example flows can be found [here](https://flows.nodered.org/flow/01271a01a6b647b
 
 ### Release Notes
 
-Version **0.3.23** allows you to request the device meta data, e.g. availability status. Further more it is now possible to request all or a specific device service of all related devices at once. As a result you get an array to calculate e.g. the total power consumption of all smart plugs or the average temperature across all rooms.
+Version **0.3.22** allows you to request the device meta data, e.g. the availability status. In addition, it is now possible to request all device services or a specific state across all related devices at once. The result is an array that you can use, for example, to calculate the total power consumption of all smart plugs or the average temperature across all rooms.
 
-Some legacy code has been removed. **If you encounter any problem with your shc-config after the update, you probably have to recreate it to solve this problem.**
+Some legacy code has been removed. **If you encounter any problem with your shc-config after the update to version 0.3.22, you will probably need to recreate it to solve this problem.**
 
 With version **0.2.14** the **smart thermostat (TRV)** was introduced and optimizations were implemented that improves the interaction with the **Node-RED dashboard**: 
 - **msg.topic** now contains the name of a device, so that several devices can be separated in a **dashboard chart**. You are also free to configure **msg.topic** via the device property **name**.
@@ -47,19 +47,19 @@ If you encounter any problem, do not hesitate to create an issue.
 
 ## Device Node
 
-There are two ways to receive data from the SHC, either by [long polling](#long-polling) or by a [request](#requesting). Please note that you should always prefer the long polling mechanism to receive data from the SHC rather than requesting it. However, sometimes it is useful to request a state at a specific time, but you should not do this too often in a short time period, as described [here](https://github.com/BoschSmartHome/bosch-shc-api-docs#limit-the-number-of-requests-in-a-given-time-period).
+There are two ways to receive data from the SHC, either by [long polling](#long-polling) or by a [request](#requesting). Please note that you should always prefer the long polling mechanism to receive data from the SHC rather than requesting it. However, sometimes it is useful to request a state at a specific time, but you should not do this too often in a short time period, as described [here](https://github.com/BoschSmartHome/bosch-shc-api-docs/tree/master/best_practice#limit-the-number-of-requests-in-a-given-time-period).
 
 
 ### Long Polling
 
-By default events are received via **long polling** from the SHC as soon as any state of a service changes. Each device has several services. A device node sends either [all related services of a device](#get-all-services-of-a-device), [a specific service](#get-a-specific-service-of-a-device) or a [single state](#get-a-state).
+By default events are received via **long polling** from the SHC as soon as any state of a service changes. Each device has several services. A device node sends either the meta data of a device, [all related services of a device](#get-all-services-of-a-device), [a specific service](#get-a-specific-service-of-a-device) or a [single state](#get-a-state).
 
 ![Device node](docs/device_node.png)
 
 
 ### Requesting
 
-To request a device any **msg** can be used, if the **msg.payload** does not match the values to [set a state](#set-a-state). The device node overwrites **msg.topic** and **msg.payload** with the state, service, or all services as array, as configured in the device node configuration page.
+To request a device any **msg** can be used, if the **msg.payload** does not match the values to [set a state](#set-a-state). The device node overwrites **msg.topic** and **msg.payload** with the selected information as configured in the device node configuration page.
 
 ![Request a device](docs/device_node_request.png)
 
@@ -102,14 +102,14 @@ If the **msg.payload** matches the predefined **type** and **range** of the **se
 
 ## Scenario Node
 
-Use this node to trigger the scenario defined in this node. Each **msg** can be used as a trigger.
+Use this node to trigger the defined scenario. Each **msg** can be used as a trigger. This node sends a message when the defined scenario has been triggered.
 
 ![Scenario node](docs/scenario_node.png)
 
 
 ## Faults Node
 
-This node sends all events containing the **faults**-key. These messages usually refer to low-battery events of battery-powered edge devices.
+This node sends all events containing the **faults** property. These messages usually refer to low-battery events of battery-powered edge devices.
 
 ![Faults node](docs/faults_node.png)
 

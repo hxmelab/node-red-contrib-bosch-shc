@@ -131,12 +131,12 @@
 
                         RED.notify('Got it, please select a device', 'notice');
                     } else {
-                        RED.notify('No device or room found', 'notice');
+                        RED.notify('No device or no room found', 'notice');
                     }
                 }
 
                 if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {
-                    RED.notify('Requesting devices and rooms, please wait...', 'notice');
+                    RED.notify('Getting devices and rooms, please wait...', 'notice');
                     $.getJSON('shc/devices', {config: shcConfig.id})
                         .done(devices => {
                             $.getJSON('shc/rooms', {config: shcConfig.id})
@@ -256,8 +256,9 @@
         <input type="text" id="node-input-name" placeholder="Name" />
     </div>
 
-    <div class="form-tips"><b>Hint:</b> Requesting a device, e.g. via an injection node, especially all devices, 
-        should be done sparingly (see <a href="https://github.com/BoschSmartHome/bosch-shc-api-docs/tree/master/best_practice#limit-the-number-of-requests-in-a-given-time-period">Bosch Smart Home Local API Documentation</a>).
+    <div class="form-tips"><b>Hint:</b> <a href="https://github.com/hxmelab/node-red-contrib-bosch-shc#requesting"> Requesting a device</a>, 
+        in particular all devices, should be done sparingly 
+        (see <a href="https://github.com/BoschSmartHome/bosch-shc-api-docs/tree/master/best_practice#limit-the-number-of-requests-in-a-given-time-period">Bosch Smart Home Local API Documentation</a>).
     </div>
 </script>
 
