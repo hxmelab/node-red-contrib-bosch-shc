@@ -114,3 +114,14 @@ This node sends all events containing the **faults** property. These messages us
 ![Faults node](docs/faults_node.png)
 
 By activating the **Debug** check box, this node sends all messages that are received from the SHC via long polling. 
+
+
+## Node-RED Dashboard
+
+Putting all together, your dashboard could look like that:
+![Node-RED dashboard desktop](docs/dashboard_desktop.png "Node-RED dashboard desktop")
+
+And on a mobile screen:
+![Node-RED dashboard mobile](docs/dashboard_mobile.png "Node-RED dashboard mobile")
+
+
