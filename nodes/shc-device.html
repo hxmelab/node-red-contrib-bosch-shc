@@ -52,11 +52,17 @@
                 const selectDevice = $('#node-input-device');
 
                 function format(device) {
-                    const services = device.deviceServiceIds.filter(element => {
-                        return supportedServices.includes(element);
-                    }).reduce((acc, element) => {
-                        return acc + ',' + element;
-                    });
+                    let services = '';
+                    
+                    try {
+                        services = device.deviceServiceIds.filter(element => {
+                            return supportedServices.includes(element);
+                        }).reduce((acc, element) => {
+                            return acc + ',' + element;
+                        });
+                    } catch (e) {
+                        RED.notify('Unexpected Device Service Array', 'error');
+                    }
 
                     return $('<option/>')
                         .val(device.name + '|' + device.id + '|' + device.deviceModel + '|' + services)
