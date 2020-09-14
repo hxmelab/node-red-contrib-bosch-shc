@@ -129,6 +129,8 @@ module.exports = function (RED) {
 
         isValid(newState) {
             switch (this.serviceId) {
+                case 'BinarySwitch':
+                case 'HueBlinkingActuator':
                 case 'SmokeDetectorCheck':
                 case 'PowerSwitch':
                 case 'PrivacyMode':
@@ -137,12 +139,20 @@ module.exports = function (RED) {
                 case 'ShutterControl': return (typeof newState === 'number' && newState >= 0 && newState <= 1) || typeof newState === 'string';
                 case 'HeatingCircuit':
                 case 'RoomClimateControl': return (typeof newState === 'number' && newState >= 5 && newState <= 30);
+                case 'MultiLevelSwitch': return (typeof newState === 'number' && newState >= 0 && newState <= 100);
+                case 'HSBColorActuator': return (typeof newState === 'number' && newState < 0);
+                case 'HueColorTemperature': return (typeof newState === 'number' && newState > 152 && newState < 501);
                 default: return false;
             }
         }
 
         getServiceBody(newState) {
             switch (this.serviceId) {
+                case 'BinarySwitch': return {'@type': 'binarySwitchState', on: newState};
+                case 'MultiLevelSwitch': return {'@type': 'multiLevelSwitchState', level: newState};
+                case 'HSBColorActuator': return {'@type': 'colorState', rgb: newState};
+                case 'HueColorTemperature': return {'@type': 'colorTemperatureState', colorTemperature: newState};
+                case 'HueBlinkingActuator': return {'@type': 'hueBlinkingState', blinkingState: (newState ? 'ON' : 'OFF')};
                 case 'SmokeDetectorCheck': return {'@type': 'smokeDetectorCheckState', value: 'SMOKE_TEST_REQUESTED'};
                 case 'PowerSwitch': return {'@type': 'powerSwitchState', switchState: (newState ? 'ON' : 'OFF')};
                 case 'HeatingCircuit': return {'@type': 'heatingCircuitState', setpointTemperature: (newState * 2).toFixed() / 2};
