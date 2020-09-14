@@ -56,14 +56,14 @@
 
                 function format(device) {
                     let services = '';
-                    
+
                     try {
                         services = device.deviceServiceIds.filter(element => {
                             return supportedServices.includes(element);
                         }).reduce((acc, element) => {
                             return acc + ',' + element;
                         });
-                    } catch (e) {
+                    } catch (error) {
                         RED.notify('Unexpected Device Service Array', 'error');
                     }
 
