@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-bosch-shc",
-  "version": "0.3.23",
+  "version": "0.3.24",
   "description": "Bosch Smart Home Controller (SHC) nodes for Node-Red",
   "repository": "https://github.com/hxmelab/node-red-contrib-bosch-shc",
   "main": "none",
@@ -20,6 +20,9 @@
     "name": "hxmelab",
     "email": "hxmelab@gmail.com"
   },
+  "contributors": [
+    "Sebastian Raff <hobbyquaker@gmail.com> https://github.com/hobbyquaker"
+  ],
   "license": "MIT",
   "node-red": {
     "nodes": {
@@ -62,7 +65,10 @@
       "unicorn/prevent-abbreviations": 0,
       "promise/prefer-await-to-then": "warn",
       "prefer-object-spread": "warn",
-      "complexity": ["warn", 30],
+      "complexity": [
+        "warn",
+        30
+      ],
       "no-unused-vars": [
         2,
         {
