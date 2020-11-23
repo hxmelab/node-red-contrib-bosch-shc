@@ -153,8 +153,16 @@ module.exports = function (RED) {
         function filter(res) {
             const filterList = [];
             res.forEach(element => {
-                if (Object.prototype.hasOwnProperty.call(element, 'fqdn') && element.fqdn.includes('Bosch SHC')) {
-                    filterList.push(element);
+                if (element && element.fqdn && element.fqdn.includes('Bosch SHC')) {
+                    if (element.packet && element.packet.additionals) {
+                        element.packet.additionals.forEach(record => {
+                            if (record && record.class === 'IN' && ['A', 'AAAA'].includes(record.type)) {
+                                if (!filterList.find(e => e.address === record.rdata)) {
+                                    filterList.push({address: record.rdata, fqdn: element.fqdn});
+                                }
+                            }
+                        });
+                    }
                 }
             });
             result.set({'content-type': 'application/json; charset=utf-8'});
