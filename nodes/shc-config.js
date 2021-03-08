@@ -157,7 +157,7 @@ module.exports = function (RED) {
                     if (element.packet && element.packet.additionals) {
                         element.packet.additionals.forEach(record => {
                             if (record && record.class === 'IN' && ['A', 'AAAA'].includes(record.type)) {
-                                if (!filterList.find(e => e.address === record.rdata)) {
+                                if (!filterList.some(e => e.address === record.rdata)) {
                                     filterList.push({address: record.rdata, fqdn: element.fqdn});
                                 }
                             }

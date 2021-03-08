@@ -42,7 +42,7 @@
                             'IntrusionDetectionControl,Keypad,LatestMotion,' +
                             'PowerMeter,PowerSwitch,PresenceSimulationConfiguration,' +
                             'PrivacyMode,RoomClimateControl,ShutterContact, ' +
-                            'ShutterControl, SmokeDetectorCheck,TemperatureLevel,ValveTappet,' +
+                            'ShutterControl,SmokeDetectorCheck,TemperatureLevel,ValveTappet,' +
                             'MultiLevelSwitch,HSBColorActuator,HueColorTemperature,HueBlinkingActuator,' +
                             'BinarySwitch';
 
@@ -54,7 +54,7 @@
                 const shcConfig = RED.nodes.node($('#node-input-shc').val());
                 const selectDevice = $('#node-input-device');
 
-                function format(device) {
+                function format(device, roomName) {
                     let services = '';
 
                     try {
@@ -64,11 +64,12 @@
                             return acc + ',' + element;
                         });
                     } catch (error) {
+                        console.log(error);
                         RED.notify('Unexpected Device Service Array', 'error');
                     }
 
                     return $('<option/>')
-                        .val(device.name + '|' + device.id + '|' + device.deviceModel + '|' + services)
+                        .val(device.name + '|' + device.id + '|' + device.deviceModel + '|' + services + '|' + roomName)
                         .text(device.name);
                 }
 
@@ -111,7 +112,7 @@
                         const optGroup = $('<optgroup label="Devices"></optgroup>');
                         selectDevice.append(optGroup);
                         optGroup.append($('<option/>')
-                            .val('all|all|all|' + supportedServices)
+                            .val('all|all|all|' + supportedServices + '|')
                             .text('All Devices'));
 
                         // Service in this context means e.g. alarm system, presence simulation,
@@ -133,7 +134,7 @@
                             const roomGroup = $('<optgroup label="' + roomName + '"></optgroup>');
                             selectDevice.append(roomGroup);
                             deviceList.reduce((parent, device) => {
-                                parent.append(format(device));
+                                parent.append(format(device, roomName));
                                 return parent;
                             }, roomGroup);
                         }, this);
