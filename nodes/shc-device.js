@@ -13,6 +13,7 @@ module.exports = function (RED) {
             this.deviceName = config.device.split('|')[0];
             this.deviceId = config.device.split('|')[1];
             this.deviceModel = config.device.split('|')[2];
+            this.roomName = config.device.split('|')[4];
             this.serviceId = config.service;
             this.state = config.state;
             this.poll = config.poll;
@@ -100,7 +101,7 @@ module.exports = function (RED) {
         }
 
         setMsgObject(data) {
-            const msg = {topic: (this.name || this.deviceName)};
+            const msg = {topic: (this.name || this.deviceName), room: this.roomName};
             if (this.serviceId && this.state) {
                 if (data.state && Object.prototype.hasOwnProperty.call(data.state, this.state)) {
                     msg.payload = this.convertState(data.state[this.state]);
