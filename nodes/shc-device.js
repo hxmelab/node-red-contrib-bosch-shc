@@ -32,16 +32,21 @@ module.exports = function (RED) {
                 if (this.shcConfig && this.shcConfig.connected) {
                     // Set a state on a single device service
                     if (this.isValid(msg.payload) && this.serviceId && this.getServiceBody(msg.payload)) {
-                        this.shcConfig.shc.getBshcClient().putState(this.getPath(),
-                            this.getServiceBody(msg.payload)).subscribe(result => {
-                            if (result._parsedResponse && result._parsedResponse.message) {
-                                send({topic: this.deviceName, payload: result._parsedResponse.message});
-                            }
-
+                        if (this.deviceId === 'all') {
+                            // ToDo: Add method to handle multiple actions, e.g. reset all power meters
                             done();
-                        }, err => {
-                            done(err);
-                        });
+                        } else {
+                            this.shcConfig.shc.getBshcClient().putState(this.getPath(),
+                                this.getServiceBody(msg.payload)).subscribe(result => {
+                                if (result._parsedResponse && result._parsedResponse.message) {
+                                    send({topic: this.deviceName, payload: result._parsedResponse.message});
+                                }
+
+                                done();
+                            }, err => {
+                                done(err);
+                            });
+                        }
                         // Get all device services regardless of a device
                     } else if (this.deviceId === 'all' && this.serviceId) {
                         this.shcConfig.shc.getBshcClient()
@@ -133,6 +138,7 @@ module.exports = function (RED) {
                 case 'HueBlinkingActuator':
                 case 'SmokeDetectorCheck':
                 case 'PowerSwitch':
+                case 'PowerMeter':
                 case 'PrivacyMode':
                 case 'IntrusionDetectionControl':
                 case 'PresenceSimulationConfiguration': return (typeof newState === 'boolean');
@@ -155,6 +161,7 @@ module.exports = function (RED) {
                 case 'HueBlinkingActuator': return {'@type': 'hueBlinkingState', blinkingState: (newState ? 'ON' : 'OFF')};
                 case 'SmokeDetectorCheck': return {'@type': 'smokeDetectorCheckState', value: 'SMOKE_TEST_REQUESTED'};
                 case 'PowerSwitch': return {'@type': 'powerSwitchState', switchState: (newState ? 'ON' : 'OFF')};
+                case 'PowerMeter': return {'@type': 'powerMeterState', energyConsumption: 0};
                 case 'HeatingCircuit': return {'@type': 'heatingCircuitState', setpointTemperature: (newState * 2).toFixed() / 2};
                 case 'RoomClimateControl': return {'@type': 'climateControlState', setpointTemperature: (newState * 2).toFixed() / 2};
                 case 'PrivacyMode': return {'@type': 'privacyModeState', value: (newState ? 'DISABLED' : 'ENABLED')};
