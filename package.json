@@ -33,12 +33,12 @@
     }
   },
   "dependencies": {
-    "bosch-smart-home-bridge": "0.2.12",
-    "node-dns-sd": "0.4.1"
+    "bosch-smart-home-bridge": "0.2.15",
+    "node-dns-sd": "0.4.2"
   },
   "devDependencies": {
-    "eslint-plugin-html": "^6.1.0",
-    "xo": "^0.33.1"
+    "eslint-plugin-html": "^6.1.2",
+    "xo": "^0.38.2"
   },
   "xo": {
     "nodeVersion": "12",
@@ -62,6 +62,9 @@
       "unicorn/prefer-string-slice": "warn",
       "valid-jsdoc": 0,
       "eslint-comments/no-unused-disable": 0,
+      "unicorn/no-array-reduce": 0,
+      "unicorn/no-array-for-each": 0,
+      "unicorn/no-lonely-if": 0,
       "unicorn/prevent-abbreviations": 0,
       "promise/prefer-await-to-then": "warn",
       "prefer-object-spread": "warn",
