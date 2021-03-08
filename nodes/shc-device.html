@@ -64,6 +64,7 @@
                             return acc + ',' + element;
                         });
                     } catch (error) {
+                        console.log(error);
                         RED.notify('Unexpected Device Service Array', 'error');
                     }
 
