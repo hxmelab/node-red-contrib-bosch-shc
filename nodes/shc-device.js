@@ -125,12 +125,12 @@ module.exports = function (RED) {
         }
 
         isRelevant(msg) {
-            return ((msg['@type'] === 'DeviceServiceData' && this.deviceId === 'all' && this.serviceId === 'all') ||
-                    (msg['@type'] === 'device' && this.deviceId === 'all' && !this.serviceId) ||
-                    (msg['@type'] === 'DeviceServiceData' && this.deviceId === 'all' && this.serviceId === msg.id) ||
-                    (msg['@type'] === 'DeviceServiceData' && this.deviceId === msg.deviceId && this.serviceId === 'all') ||
-                    (msg['@type'] === 'device' && this.deviceId === msg.id && !this.serviceId) ||
-                    (msg['@type'] === 'DeviceServiceData' && this.deviceId === msg.deviceId && this.serviceId === msg.id));
+            return ((msg['@type'] === 'DeviceServiceData' && this.deviceId === 'all' && this.serviceId === 'all')
+                    || (msg['@type'] === 'device' && this.deviceId === 'all' && !this.serviceId)
+                    || (msg['@type'] === 'DeviceServiceData' && this.deviceId === 'all' && this.serviceId === msg.id)
+                    || (msg['@type'] === 'DeviceServiceData' && this.deviceId === msg.deviceId && this.serviceId === 'all')
+                    || (msg['@type'] === 'device' && this.deviceId === msg.id && !this.serviceId)
+                    || (msg['@type'] === 'DeviceServiceData' && this.deviceId === msg.deviceId && this.serviceId === msg.id));
         }
 
         isValid(newState) {
@@ -163,8 +163,8 @@ module.exports = function (RED) {
                 case 'SmokeDetectorCheck': return {'@type': 'smokeDetectorCheckState', value: 'SMOKE_TEST_REQUESTED'};
                 case 'PowerSwitch': return {'@type': 'powerSwitchState', switchState: (newState ? 'ON' : 'OFF')};
                 case 'PowerMeter': return {'@type': 'powerMeterState', energyConsumption: 0};
-                case 'HeatingCircuit': return {'@type': 'heatingCircuitState', setpointTemperature: (newState * 2).toFixed() / 2};
-                case 'RoomClimateControl': return {'@type': 'climateControlState', setpointTemperature: (newState * 2).toFixed() / 2};
+                case 'HeatingCircuit': return {'@type': 'heatingCircuitState', setpointTemperature: (newState * 2).toFixed(0) / 2};
+                case 'RoomClimateControl': return {'@type': 'climateControlState', setpointTemperature: (newState * 2).toFixed(0) / 2};
                 case 'PrivacyMode': return {'@type': 'privacyModeState', value: (newState ? 'DISABLED' : 'ENABLED')};
                 case 'IntrusionDetectionControl': return {'@type': 'intrusionDetectionControlState', value: (newState ? 'SYSTEM_ARMED' : 'SYSTEM_DISARMED')};
                 case 'PresenceSimulationConfiguration': return {'@type': 'presenceSimulationConfigurationState', enabled: newState};
