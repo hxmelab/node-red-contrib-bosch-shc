@@ -6,24 +6,24 @@
             shc: {
                 value: '',
                 type: 'shc-config',
-                required: true
+                required: true,
             },
             poll: {
-                value: true
+                value: true,
             },
             device: {
                 value: '',
-                required: true
+                required: true,
             },
             service: {
-                value: ''
+                value: '',
             },
             state: {
-                value: ''
+                value: '',
             },
             name: {
-                value: ''
-            }
+                value: '',
+            },
         },
         inputs: 1,
         outputs: 1,
@@ -33,18 +33,18 @@
         },
         paletteLabel: 'device',
         oneditprepare() {
-            const supportedDevices = 'CAMERA_360, CAMERA_EYES, BBL, BSM, ' +
-                            'INTRUSION_DETECTION_SYSTEM, MD, PSM, PRESENCE_SIMULATION_SERVICE, ' +
-                            'ROOM_CLIMATE_CONTROL, SD, SWD, TWINGUARD, WRC2, TRV, THB, BWTH, ' +
-                            'LOGAMATIC_WEB_KM200, HEATING_CIRCUIT, HUE_LIGHT_ROOM_CONTROL,' +
-                            'HUE_LIGHT,LEDVANCE_LIGHT,PLUG_COMPACT';
-            const supportedServices = 'AirQualityLevel,BatteryLevel,HumidityLevel,' +
-                            'IntrusionDetectionControl,Keypad,LatestMotion,' +
-                            'PowerMeter,PowerSwitch,PresenceSimulationConfiguration,' +
-                            'PrivacyMode,RoomClimateControl,ShutterContact, ' +
-                            'ShutterControl,SmokeDetectorCheck,TemperatureLevel,ValveTappet,' +
-                            'MultiLevelSwitch,HSBColorActuator,HueColorTemperature,HueBlinkingActuator,' +
-                            'BinarySwitch';
+            const supportedDevices = 'CAMERA_360, CAMERA_EYES, BBL, BSM, '
+                        + 'INTRUSION_DETECTION_SYSTEM, MD, PSM, PRESENCE_SIMULATION_SERVICE, '
+                        + 'ROOM_CLIMATE_CONTROL, SD, SWD, TWINGUARD, WRC2, TRV, THB, BWTH, '
+                        + 'LOGAMATIC_WEB_KM200, HEATING_CIRCUIT, HUE_LIGHT_ROOM_CONTROL,'
+                        + 'HUE_LIGHT,LEDVANCE_LIGHT,PLUG_COMPACT';
+            const supportedServices = 'AirQualityLevel,BatteryLevel,HumidityLevel,'
+                        + 'IntrusionDetectionControl,Keypad,LatestMotion,'
+                        + 'PowerMeter,PowerSwitch,PresenceSimulationConfiguration,'
+                        + 'PrivacyMode,RoomClimateControl,ShutterContact, '
+                        + 'ShutterControl,SmokeDetectorCheck,TemperatureLevel,ValveTappet,'
+                        + 'MultiLevelSwitch,HSBColorActuator,HueColorTemperature,HueBlinkingActuator,'
+                        + 'BinarySwitch';
 
             const deviceBoxId = '#node-input-device';
             const deviceBoxText = '<input type="text" id="node-input-device" placeholder="Select a device" style="width: 100%;">';
@@ -58,11 +58,7 @@
                     let services = '';
 
                     try {
-                        services = device.deviceServiceIds.filter(element => {
-                            return supportedServices.includes(element);
-                        }).reduce((acc, element) => {
-                            return acc + ',' + element;
-                        });
+                        services = device.deviceServiceIds.filter(element => supportedServices.includes(element)).reduce((acc, element) => acc + ',' + element);
                     } catch (error) {
                         console.log(error);
                         RED.notify('Unexpected Device Service Array', 'error');
@@ -79,7 +75,7 @@
                         if (element.id === roomId) {
                             roomName = element.name;
                         }
-                    }, this);
+                    });
                     return roomName;
                 }
     
@@ -93,7 +89,7 @@
                         if (isSupported(element.deviceModel) && element.roomId === roomId) {
                             filterList.push(element);
                         }
-                    }, this);
+                    });
                     return filterList;
                 }
 
@@ -103,7 +99,7 @@
                         if (isSupported(element.deviceModel) && typeof element.roomId === 'undefined') {
                             filterList.push(element);
                         }
-                    }, this);
+                    });
                     return filterList;
                 }
 
@@ -137,7 +133,7 @@
                                 parent.append(format(device, roomName));
                                 return parent;
                             }, roomGroup);
-                        }, this);
+                        });
 
                         RED.notify('Got it, please select a device', 'notice');
                     } else {
@@ -211,7 +207,7 @@
 
                 $(serviceBoxId).val(sVal);
             });
-        }
+        },
     });
 </script>
 

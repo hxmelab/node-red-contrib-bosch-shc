@@ -3,7 +3,7 @@
 const mdns = require('node-dns-sd');
 
 const {BoschSmartHomeBridgeBuilder, BshbUtils} = require('bosch-smart-home-bridge');
-const ShcLogger = require('./shc-logger');
+const ShcLogger = require('./shc-logger.js');
 
 module.exports = function (RED) {
     class ShcConfigNode {
@@ -69,7 +69,7 @@ module.exports = function (RED) {
 
             setTimeout(() => {
                 this.poll();
-            }, 20000);
+            }, 20_000);
         }
 
         /**
@@ -182,7 +182,7 @@ module.exports = function (RED) {
      */
     RED.httpAdmin.get('/shc/id', RED.auth.needsPermission('shc.read'), (req, result) => {
         result.set({'content-type': 'application/json; charset=utf-8'});
-        result.end(JSON.stringify('node-red-contrib-bosch-shc-' + ('0000000000' + Math.floor(Math.random() * 10000000000)).slice(-10)));
+        result.end(JSON.stringify('node-red-contrib-bosch-shc-' + ('0000000000' + Math.floor(Math.random() * 10_000_000_000)).slice(-10)));
     });
 
     /**
@@ -340,7 +340,7 @@ module.exports = function (RED) {
         credentials: {
             password: {type: 'password'},
             key: {type: 'password'},
-            cert: {type: 'password'}
-        }
+            cert: {type: 'password'},
+        },
     });
 };

@@ -4,31 +4,31 @@
         defaults: {
             shcip: {
                 value: '',
-                required: true
+                required: true,
             },
             clientid: {
                 value: '',
-                required: true
+                required: true,
             },
             clientname: {
                 value: 'Node-RED-Contrib-Bosch-SHC',
-                required: true
+                required: true,
             },
             state: {
                 value: 'NOT PAIRED',
-                require: true
-            }
+                require: true,
+            },
         },
         credentials: {
             password: {
-                type: 'password'
+                type: 'password',
             },
             cert: {
-                type: 'password'
+                type: 'password',
             },
             key: {
-                type: 'password'
-            }
+                type: 'password',
+            },
         },
         label() {
             return 'https://' + this.shcip;
@@ -111,9 +111,9 @@
                 const cert = $('#node-config-input-cert').val();
                 const state = $('#node-config-input-state').val();
 
-                if (shcip.trim().length === 0 ||
-                    clientid.trim().length === 0 ||
-                    clientname.trim().length === 0) {
+                if (shcip.trim().length === 0
+                || clientid.trim().length === 0
+                || clientname.trim().length === 0) {
                     RED.notify('Some information are missing', 'error');
                 } else {
                     RED.notify('POST New Client', 'notice');
@@ -137,7 +137,7 @@
                     }
                 }
             });
-        }
+        },
     });
 </script>
 

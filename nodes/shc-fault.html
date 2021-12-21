@@ -7,20 +7,20 @@
             shc: {
                 value: '',
                 type: 'shc-config',
-                required: true
+                required: true,
             },
             name: {
-                value: ''
+                value: '',
             },
             debug: {
-                value: false
-            }
+                value: false,
+            },
         },
         label() {
             return this.name || (this.debug ? 'shc debug' : 'shc faults');
         },
         paletteLabel: 'faults',
-        icon: 'debug.png'
+        icon: 'debug.png',
     });
 </script>
 
