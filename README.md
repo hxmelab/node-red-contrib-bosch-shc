@@ -1,5 +1,5 @@
 
-[![NPM](https://nodei.co/npm/node-red-contrib-bosch-shc.png)](https://nodei.co/npm/node-red-contrib-bosch-shc/)
+
 
 # Bosch Smart Home Controller (SHC) nodes for Node-Red
 [![NPM version](https://badge.fury.io/js/node-red-contrib-bosch-shc.svg)](http://badge.fury.io/js/node-red-contrib-bosch-shc)
