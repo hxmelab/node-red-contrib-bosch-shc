@@ -33,7 +33,7 @@
     }
   },
   "dependencies": {
-    "bosch-smart-home-bridge": "1.0.0",
+    "bosch-smart-home-bridge": "1.0.4",
     "node-dns-sd": "0.4.2"
   },
   "devDependencies": {
