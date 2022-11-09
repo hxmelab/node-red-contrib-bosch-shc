@@ -141,6 +141,8 @@ module.exports = function (RED) {
                 case 'PowerSwitch':
                 case 'PowerMeter':
                 case 'PrivacyMode':
+                case 'CameraNotification':
+                case 'CameraLight':
                 case 'IntrusionDetectionControl':
                 case 'PresenceSimulationConfiguration': return (typeof newState === 'boolean');
                 case 'ShutterControl': return (typeof newState === 'number' && newState >= 0 && newState <= 1) || typeof newState === 'string';
@@ -166,6 +168,8 @@ module.exports = function (RED) {
                 case 'HeatingCircuit': return {'@type': 'heatingCircuitState', setpointTemperature: (newState * 2).toFixed(0) / 2};
                 case 'RoomClimateControl': return {'@type': 'climateControlState', setpointTemperature: (newState * 2).toFixed(0) / 2};
                 case 'PrivacyMode': return {'@type': 'privacyModeState', value: (newState ? 'DISABLED' : 'ENABLED')};
+                case 'CameraNotification': return {'@type': 'cameraNotificationState', value: (newState ? 'DISABLED' : 'ENABLED')};
+                case 'CameraLight': return {'@type': 'cameraLightState', value: (newState ? 'OFF' : 'ON')};
                 case 'IntrusionDetectionControl': return {'@type': 'intrusionDetectionControlState', value: (newState ? 'SYSTEM_ARMED' : 'SYSTEM_DISARMED')};
                 case 'PresenceSimulationConfiguration': return {'@type': 'presenceSimulationConfigurationState', enabled: newState};
                 case 'ShutterControl':
