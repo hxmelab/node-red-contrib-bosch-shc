@@ -169,7 +169,7 @@ module.exports = function (RED) {
                 case 'RoomClimateControl': return {'@type': 'climateControlState', setpointTemperature: (newState * 2).toFixed(0) / 2};
                 case 'PrivacyMode': return {'@type': 'privacyModeState', value: (newState ? 'DISABLED' : 'ENABLED')};
                 case 'CameraNotification': return {'@type': 'cameraNotificationState', value: (newState ? 'DISABLED' : 'ENABLED')};
-                case 'CameraLight': return {'@type': 'cameraLightState', value: (newState ? 'OFF' : 'ON')};
+                case 'CameraLight': return {'@type': 'cameraLightState', value: (newState ? 'ON' : 'OFF')};
                 case 'IntrusionDetectionControl': return {'@type': 'intrusionDetectionControlState', value: (newState ? 'SYSTEM_ARMED' : 'SYSTEM_DISARMED')};
                 case 'PresenceSimulationConfiguration': return {'@type': 'presenceSimulationConfigurationState', enabled: newState};
                 case 'ShutterControl':
@@ -188,11 +188,11 @@ module.exports = function (RED) {
         }
 
         convertState(state) {
-            if (state === 'ON' || state === 'DISABLED' || state === 'SYSTEM_ARMED') {
+            if (state === 'ON' || state === 'ENABLED' || state === 'SYSTEM_ARMED') {
                 return true;
             }
 
-            if (state === 'OFF' || state === 'ENABLED' || state === 'SYSTEM_DISARMED') {
+            if (state === 'OFF' || state === 'DISABLED' || state === 'SYSTEM_DISARMED') {
                 return false;
             }
 
