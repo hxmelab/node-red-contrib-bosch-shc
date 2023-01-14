@@ -99,6 +99,13 @@ If the **msg.payload** matches the predefined **type** and **range** of the **se
 | **ShutterControl**                  | number       | 0.000, 0.005, ..., 0.995, 1.000 | Set the level of a shutter (0 = close) |
 |                                     | string | stop, close, open | Set the operation state of a shutter (case insensitive) |
 
+![Set state flow](docs/flow_setpointTemperature.png)
+
+Set the temperature of a thermostat with `RoomClimateControl` via `setpointTemperature`
+
+![Set state device](docs/device_node_setpointTemperature.png)
+
+![Trigger state device](docs/trigger_setpointTemperature.png)
 
 ## Scenario Node
 
