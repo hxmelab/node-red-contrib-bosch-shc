@@ -11,7 +11,7 @@
 
 This module provides several nodes for interacting with Bosch Smart Home services and edge devices via the local controller API. 
 
-A full documentation of the API can be found [here](https://apidocs.bosch-smarthome.com/local/).
+A full documentation of the API can be found [here](https://local.apidocs.bosch-smarthome.com/).
 
 Example flows can be found [here](https://flows.nodered.org/flow/01271a01a6b647b7b7cfda67c332cfbc).
 
