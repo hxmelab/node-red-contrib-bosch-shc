@@ -1,7 +1,6 @@
 'use strict';
 
 const mdns = require('node-dns-sd');
-
 const {BoschSmartHomeBridgeBuilder, BshbUtils} = require('bosch-smart-home-bridge');
 const ShcLogger = require('./shc-logger.js');
 
@@ -25,11 +24,12 @@ module.exports = function (RED) {
             this.on('close', this.destructor);
 
             if (this.state === 'PAIRED') {
-                this.shc = new BoschSmartHomeBridgeBuilder.builder()
+                this.shc = BoschSmartHomeBridgeBuilder.builder()
                     .withHost(this.shcip)
                     .withClientCert(this.cert)
                     .withClientPrivateKey(this.key)
                     .withLogger(new ShcLogger())
+                    .withIgnoreCertificateCheck(false)
                     .build();
 
                 this.shc.getBshcClient().getInformation().subscribe(() => {
@@ -59,9 +59,12 @@ module.exports = function (RED) {
 
             if (err && Number.isInteger(err.errorType)) {
                 switch (err.errorType) {
-                    case 3: this.pollid = null;
+                    case 3: { this.pollid = null;
                         break;
-                    default: this.error(err + ' Type ' + err.errorType + ', Try to reconnect...');
+                    }
+
+                    default: { this.error(err + ' Type ' + err.errorType + ', Try to reconnect...');
+                    }
                 }
             } else if (err) {
                 this.error(err);

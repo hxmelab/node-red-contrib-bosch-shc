@@ -96,7 +96,7 @@
                 function filterUndefinedRoom(devices) {
                     const filterList = [];
                     devices.forEach(element => {
-                        if (isSupported(element.deviceModel) && typeof element.roomId === 'undefined') {
+                        if (isSupported(element.deviceModel) && element.roomId === undefined) {
                             filterList.push(element);
                         }
                     });
