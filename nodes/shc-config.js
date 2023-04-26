@@ -24,7 +24,7 @@ module.exports = function (RED) {
             this.on('close', this.destructor);
 
             if (this.state === 'PAIRED') {
-                this.shc = new BoschSmartHomeBridgeBuilder.builder()
+                this.shc = BoschSmartHomeBridgeBuilder.builder()
                     .withHost(this.shcip)
                     .withClientCert(this.cert)
                     .withClientPrivateKey(this.key)
