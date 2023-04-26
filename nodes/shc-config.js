@@ -200,7 +200,7 @@ module.exports = function (RED) {
      * Webhook to add a client
      */
     RED.httpAdmin.get('/shc/client', RED.auth.needsPermission('shc.write'), (req, result) => {
-        const shc = new BoschSmartHomeBridgeBuilder.builder()
+        const shc = BoschSmartHomeBridgeBuilder.builder()
             .withHost(req.query.shcip)
             .withClientCert(req.query.cert)
             .withClientPrivateKey(req.query.key)
@@ -236,7 +236,7 @@ module.exports = function (RED) {
             return;
         }
 
-        const shc = new BoschSmartHomeBridgeBuilder.builder()
+        const shc = BoschSmartHomeBridgeBuilder.builder()
             .withHost(configNode.shcip)
             .withClientCert(configNode.credentials.cert)
             .withClientPrivateKey(configNode.credentials.key)
@@ -264,7 +264,7 @@ module.exports = function (RED) {
             return;
         }
 
-        const shc = new BoschSmartHomeBridgeBuilder.builder()
+        const shc = BoschSmartHomeBridgeBuilder.builder()
             .withHost(configNode.shcip)
             .withClientCert(configNode.credentials.cert)
             .withClientPrivateKey(configNode.credentials.key)
@@ -292,7 +292,7 @@ module.exports = function (RED) {
             return;
         }
 
-        const shc = new BoschSmartHomeBridgeBuilder.builder()
+        const shc = BoschSmartHomeBridgeBuilder.builder()
             .withHost(configNode.shcip)
             .withClientCert(configNode.credentials.cert)
             .withClientPrivateKey(configNode.credentials.key)
@@ -320,7 +320,7 @@ module.exports = function (RED) {
             return;
         }
 
-        const shc = new BoschSmartHomeBridgeBuilder.builder()
+        const shc = BoschSmartHomeBridgeBuilder.builder()
             .withHost(configNode.shcip)
             .withClientCert(configNode.credentials.cert)
             .withClientPrivateKey(configNode.credentials.key)
