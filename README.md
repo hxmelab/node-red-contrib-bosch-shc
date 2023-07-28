@@ -4,10 +4,10 @@
 # Bosch Smart Home Controller (SHC) nodes for Node-Red
 [![NPM version](https://badge.fury.io/js/node-red-contrib-bosch-shc.svg)](http://badge.fury.io/js/node-red-contrib-bosch-shc)
 [![Downloads](https://img.shields.io/npm/dm/node-red-contrib-bosch-shc.svg)](https://www.npmjs.com/package/node-red-contrib-bosch-shc)
-[![Dependencies Status](https://david-dm.org/hxmelab/node-red-contrib-bosch-shc.svg)](https://david-dm.org/hxmelab/node-red-contrib-bosch-shc)
 [![Build Status](https://travis-ci.org/hxmelab/node-red-contrib-bosch-shc.svg?branch=master)](https://travis-ci.org/hxmelab/node-red-contrib-bosch-shc)
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](https://github.com/hxmelab/node-red-contrib-bosch-shc/blob/master/LICENSE)
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/O4O4NNOCL)
 
 This module provides several nodes for interacting with Bosch Smart Home services and edge devices via the local controller API. 
 
