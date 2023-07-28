@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-bosch-shc",
-  "version": "0.3.29",
+  "version": "0.3.30",
   "description": "Bosch Smart Home Controller (SHC) nodes for Node-Red",
   "repository": "https://github.com/hxmelab/node-red-contrib-bosch-shc",
   "main": "none",
@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "eslint-plugin-html": "^7.1.0",
-    "xo": "^0.54.1"
+    "xo": "^0.55.0"
   },
   "xo": {
     "nodeVersion": "18",
