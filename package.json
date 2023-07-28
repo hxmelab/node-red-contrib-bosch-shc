@@ -25,12 +25,16 @@
   ],
   "license": "MIT",
   "node-red": {
+    "version": ">=1.0.0",
     "nodes": {
       "shc-config": "nodes/shc-config.js",
       "shc-device": "nodes/shc-device.js",
       "shc-scenario": "nodes/shc-scenario.js",
       "shc-fault": "nodes/shc-fault.js"
     }
+  },
+  "engines": {
+    "node": ">=12.0.0"
   },
   "dependencies": {
     "bosch-smart-home-bridge": "1.2.2",
