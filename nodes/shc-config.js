@@ -212,14 +212,16 @@ module.exports = function (RED) {
             if (res && res._parsedResponse && res._parsedResponse && res._parsedResponse.token) {
                 result.end('PAIRED');
             } else {
-                result.end('ERROR - Please check password');
+                result.end('Please check your password.');
             }
         }, err => {
             // EPROTO should be SSL alert number 42
             if (err.cause && err.cause.code && err.cause.code === 'EPROTO') {
-                result.end('ERROR - Please longpress button on SHC');
-            } else if (err.errorType && err.errorType === 2) {
-                result.end('ERROR - Please check IP of SHC');
+                result.end('SHC detected, but it’s not ready to connect. Please enable pairing mode on your SHC and try again.');
+            } else if (err.cause && err.cause.code && err.cause.code === 'EHOSTUNREACH') {
+                result.end('Unable to reach your device. Please verify the IP address and ensure your device is connected to the network.');
+            } else if (err.cause && err.cause.code && err.cause.code === 'ECONNREFUSED') {
+                result.end('Found a device, but it’s not a SHC. Please double-check the IP address and make sure the device is powered on.');
             } else {
                 console.log(err);
                 result.end('ERROR - Please check logs');
