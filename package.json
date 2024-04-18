@@ -30,6 +30,7 @@
       "shc-config": "nodes/shc-config.js",
       "shc-device": "nodes/shc-device.js",
       "shc-scenario": "nodes/shc-scenario.js",
+	  "shc-state": "nodes/shc-state.js",
       "shc-fault": "nodes/shc-fault.js"
     }
   },
