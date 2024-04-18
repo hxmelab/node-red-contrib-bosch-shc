@@ -16,17 +16,34 @@ module.exports = function (RED) {
             }
 
             /**
-             * Enable/disable user defined state
+             * Enable/disable user defined state if payload is boolean, otherwise get the state
              */
             this.on('input', (msg, send, done) => {
                 if (this.stateId && this.shcConfig && this.shcConfig.connected) {
-                    this.shcConfig.shc.getBshcClient()
-                        .setUserDefinedState(this.stateId, this.getServiceBody(msg.payload)).subscribe(() => {
-                            done();
-                        }, err => {
-                            done(err);
-                        });
+					if (typeof msg.payload === 'boolean') {
+						this.shcConfig.shc.getBshcClient()
+							.setUserDefinedState(this.stateId, msg.payload).subscribe(() => {
+								done();
+							}, err => {
+								done(err);
+							});
+					}
+					else
+					{
+						this.shcConfig.shc.getBshcClient()
+							.getUserDefinedState(this.stateId, msg.payload).subscribe(res => {
+							if (res && res._parsedResponse) {
+								result.set({'content-type': 'application/json; charset=utf-8'});
+								result.end(JSON.stringify(res._parsedResponse));
+							}
+						}, err => {
+							console.log(err);
+							result.set({'content-type': 'application/json; charset=utf-8'});
+							result.end('[]');
+						});
+					}
                 }
+				
             });
         }
 

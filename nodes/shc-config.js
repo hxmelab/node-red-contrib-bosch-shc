@@ -260,7 +260,7 @@ module.exports = function (RED) {
     /**
      * Webhook to fetch state list
      */
-    RED.httpAdmin.get('/shc/userdefinedstate', RED.auth.needsPermission('shc.read'), (req, result) => {
+    RED.httpAdmin.get('/shc/userdefinedstates', RED.auth.needsPermission('shc.read'), (req, result) => {
         const configNode = RED.nodes.getNode(req.query.config);
         if (!configNode) {
             return;
