@@ -258,6 +258,34 @@ module.exports = function (RED) {
     });
 
     /**
+     * Webhook to fetch state list
+     */
+    RED.httpAdmin.get('/shc/userdefinedstate', RED.auth.needsPermission('shc.read'), (req, result) => {
+        const configNode = RED.nodes.getNode(req.query.config);
+        if (!configNode) {
+            return;
+        }
+
+        const shc = BoschSmartHomeBridgeBuilder.builder()
+            .withHost(configNode.shcip)
+            .withClientCert(configNode.credentials.cert)
+            .withClientPrivateKey(configNode.credentials.key)
+            .withLogger(new ShcLogger())
+            .build();
+
+        shc.getBshcClient().getUserDefinedStates().subscribe(res => {
+            if (res && res._parsedResponse) {
+                result.set({'content-type': 'application/json; charset=utf-8'});
+                result.end(JSON.stringify(res._parsedResponse));
+            }
+        }, err => {
+            console.log(err);
+            result.set({'content-type': 'application/json; charset=utf-8'});
+            result.end('[]');
+        });
+    });
+
+    /**
      * Webhook to fetch room list
      */
     RED.httpAdmin.get('/shc/rooms', RED.auth.needsPermission('shc.read'), (req, result) => {

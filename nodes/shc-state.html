@@ -1,0 +1,114 @@
+<script type="text/javascript">
+    RED.nodes.registerType('shc-state', {
+        category: 'BoschSmartHome',
+        color: '#0096ff',
+        defaults: {
+            shc: {
+                value: '',
+                type: 'shc-config',
+                required: true,
+            },
+            state: {
+                value: '',
+                required: true,
+            },
+            name: {
+                value: '',
+            },
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'inject.png',
+        label() {
+            return this.name || this.state.split('|')[0] || 'shc state';
+        },
+        paletteLabel: 'state',
+        oneditprepare() {
+            const stateBoxId = '#node-input-state';
+            const stateBoxText = '<input type="text" id="node-input-state" style="width: 100%;">';
+            const stateBoxSelect = '<select id="node-input-state" style="width: 100%;" />';
+    
+            function lookupStates(value) {
+                const shcConfig = RED.nodes.node($('#node-input-shc').val());
+                const selectState = $('#node-input-state');
+
+                function format(state) {
+                    return $('<option/>')
+                        .val(state.name + '|' + state.id)
+                        .text(state.name);
+                }
+    
+                function populate(states) {
+                    if (states.length > 0) {
+                        const optGroup = $('<optgroup label="States"></optgroup>');
+                        selectState.append(optGroup);
+                        states.reduce((parent, state) => {
+                            parent.append(format(state));
+                            return parent;
+                        }, optGroup);
+                        RED.notify('Got it, please select a state', 'notice');
+                    } else {
+                        RED.notify('No state found', 'notice');
+                    }
+                }
+
+                if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {
+                    RED.notify('Requesting states, please wait...', 'notice');
+    
+                    $.getJSON('shc/userdefinedstates', {config: shcConfig.id})
+                        .done(states => {
+                            populate(states);
+                            $(stateBoxId).val(value);
+                        })
+                        .fail(err => {
+                            RED.notify(err.responseText, 'error');
+                        });
+                } else if (shcConfig) {
+                    RED.notify('Client not added to SHC', 'notice');
+                } else {
+                    RED.notify('Select SHC or create configuration', 'notice');
+                }
+            }
+
+            $('#node-input-lookup-state').click(() => {
+                const value = $(stateBoxId).val();
+
+                if ($(stateBoxId).attr('type') === 'text') {
+                    $(stateBoxId).replaceWith(stateBoxSelect);
+                    lookupStates(value);
+                } else {
+                    $(stateBoxId).replaceWith(stateBoxText);
+                    $(stateBoxId).val(value);
+                }
+            });
+        },
+    });
+</script>
+
+<script type="text/x-red" data-template-name="shc-state">
+    <div class="form-row">
+        <label for="node-input-shc"><i class="fa fa-server"></i> SHC</label>
+        <input type="text" id="node-input-shc">
+    </div>
+
+    <div class="form-row" style="white-space: nowrap;">
+        <label for="node-input-state"><i class="fa fa-tasks"></i> State</label>
+        <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+          <div style="position: absolute; left: 0px; right: 40px;">
+            <input type="text" id="node-input-state" placeholder="No state specified" style="width: 100%;" />
+          </div>
+          <a id="node-input-lookup-state" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
+            <i class="fa fa-search"></i>
+          </a>
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="shc-state">
+    <p>Input true will enable the configured state. Input false will disable it.</p>
+</script>

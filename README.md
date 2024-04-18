@@ -116,6 +116,9 @@ Use this node to trigger the defined scenario. Each **msg** can be used as a tri
 
 ![Scenario node](docs/scenario_node.png)
 
+## State Node
+
+Use this node to get/set user defined states. Use true/false to enable/disable a state.
 
 ## Faults Node
 
