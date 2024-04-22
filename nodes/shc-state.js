@@ -16,29 +16,28 @@ module.exports = function (RED) {
              */
             this.on('input', (msg, send, done) => {
                 if (this.stateId && this.shcConfig && this.shcConfig.connected) {
-            if (typeof msg.payload === 'boolean') {
-                this.shcConfig.shc.getBshcClient()
-                    .setUserDefinedState(this.stateId, msg.payload).subscribe(() => {
-                        done();
+                    if (typeof msg.payload === 'boolean') {
+                        this.shcConfig.shc.getBshcClient()
+                            .setUserDefinedState(this.stateId, msg.payload).subscribe(() => {
+                                done();
+                            }, err => {
+                                done(err);
+                            });
+                    }
+                    this.shcConfig.shc.getBshcClient()
+                        .getUserDefinedStates(this.stateId).subscribe(res => {
+                        if (res && res._parsedResponse) {
+                            result.set({'content-type': 'application/json; charset=utf-8'});
+                            result.end(JSON.stringify(res._parsedResponse));
+                            this.status({fill:"green", shape:"ring", text: res._parsedResponse});
+                        }
                     }, err => {
-                        done(err);
+                        console.log(err);
+                        result.set({'content-type': 'application/json; charset=utf-8'});
+                        result.end('[]');
+                        this.status({fill:"red", shape:"dot", text: err});
                     });
-            }
-            this.shcConfig.shc.getBshcClient()
-                .getUserDefinedStates(this.stateId).subscribe(res => {
-                if (res && res._parsedResponse) {
-                    result.set({'content-type': 'application/json; charset=utf-8'});
-                    result.end(JSON.stringify(res._parsedResponse));
-                    this.status({fill:"green", shape:"ring", text: res._parsedResponse});
                 }
-            }, err => {
-                console.log(err);
-                result.set({'content-type': 'application/json; charset=utf-8'});
-                result.end('[]');
-                this.status({fill:"red", shape:"dot", text: err});
-            });
-                }
-
             });
         }
         setMsgObject(data) {
