@@ -1,6 +1,6 @@
 'use strict';
 module.exports = function (RED) {
-    class SHCStateNode {
+    class SHCOpenDoorsNode {
         constructor(config) {
             RED.nodes.createNode(this, config);
             this.stateName = config.state.split('|')[0];
@@ -16,21 +16,12 @@ module.exports = function (RED) {
              */
             this.on('input', (msg, send, done) => {
                 if (this.stateId && this.shcConfig && this.shcConfig.connected) {
-                    if (typeof msg.payload === 'boolean') {
-                        this.shcConfig.shc.getBshcClient()
-                            .setUserDefinedState(this.stateId, msg.payload).subscribe(() => {
-                                done();
-                            }, err => {
-                                done(err);
-                            });
-                    }
-                    this.shcConfig.shc.getBshcClient()
-                        .getUserDefinedStates(this.stateId).subscribe(result => {
-                            send(this.setMsgObject(result._parsedResponse));
-                            done();
-                        }, err => {
-                            done(err);
-                        });
+                    this.shcConfig.shc.getBshcClient().getOpenWindows().subscribe(result => {
+                        send(this.setMsgObject(result._parsedResponse));
+                        done();
+                    }, err => {
+                        done(err);
+                    });
                 }
             });
         }
@@ -48,5 +39,5 @@ module.exports = function (RED) {
             });
         }
     }
-    RED.nodes.registerType('shc-state', SHCStateNode);
+    RED.nodes.registerType('shc-opendoors', SHCOpenDoorsNode);
 };
