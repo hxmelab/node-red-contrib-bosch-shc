@@ -20,6 +20,8 @@ Example flows can be found [here](https://flows.nodered.org/flow/01271a01a6b647b
 
 ### Release Notes
 
+Version **0.4.33** adds two new nodes: for Open doors/windows and for User Defined States.
+
 Version **0.3.22** allows you to request the device meta data, e.g. the availability status of a device. In addition, it is now possible to request all device services or a specific state across all related devices at once. The result is an array that you can use, for example, to calculate the total power consumption of all smart plugs or the average temperature across all rooms.
 
 Some legacy code has been removed. **If you encounter any problem with your shc-config after the update to version 0.3.22, you will probably need to recreate it to solve this problem.**
@@ -110,12 +112,23 @@ Example payload to trigger the device state change
 
 ![Trigger state device](docs/trigger_setpointTemperature.png)
 
+## OpenDoorsWindows Node
+
+Use this node to get open doors and windows.
+
+![OpenDoorsWindows node](docs/open_doors_node.png)
+
 ## Scenario Node
 
 Use this node to trigger the defined scenario. Each **msg** can be used as a trigger. This node sends an event message when the defined scenario has been triggered.
 
 ![Scenario node](docs/scenario_node.png)
 
+## User Defined State Node
+
+Use this node to get/set user defined states. Use true/false to enable/disable a state, everything else to get the state. This node sends an event message when the defined state has been changed.
+
+![State node](docs/state_node.png)
 
 ## Faults Node
 
