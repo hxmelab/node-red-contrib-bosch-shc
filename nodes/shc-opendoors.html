@@ -6,20 +6,19 @@
             shc: {
                 value: '',
                 type: 'shc-config',
-                required: true,
+                required: true
             },
             name: {
-                value: '',
-            },
+                value: ''
+            }
         },
         inputs: 1,
         outputs: 1,
         icon: 'envelope.png',
-        label() {
-            return this.name || 'shc state';
+        label: function() {
+            return this.name || 'Open Doors-Windows';
         },
-        paletteLabel: 'opendoors'
-        },
+        paletteLabel: 'open-doors-windows'
     });
 </script>
 
@@ -36,5 +35,5 @@
 </script>
 
 <script type="text/x-red" data-help-name="shc-opendoors">
-    <p>Output if there are any doors/windows open.</p>
+    <p>Get open doors / windows.</p>
 </script>

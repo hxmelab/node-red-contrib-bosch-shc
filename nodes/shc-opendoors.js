@@ -1,6 +1,6 @@
 'use strict';
 module.exports = function (RED) {
-    class SHCOpenDoorsNode {
+    class SHCOpendoorsNode {
         constructor(config) {
             RED.nodes.createNode(this, config);
             this.name = config.name;
@@ -10,16 +10,17 @@ module.exports = function (RED) {
                 this.shcConfig.registerListener(this);
             }
             /**
-             * get open doors or windows
+             * Get Opendoors state
              */
             this.on('input', (msg, send, done) => {
-                if (this.stateId && this.shcConfig && this.shcConfig.connected) {
-                    this.shcConfig.shc.getBshcClient().getOpenWindows().subscribe(result => {
-                        send(this.setMsgObject(result._parsedResponse));
-                        done();
-                    }, err => {
-                        done(err);
-                    });
+                if (this.shcConfig && this.shcConfig.connected) {
+                    this.shcConfig.shc.getBshcClient()
+                        .getOpenWindows().subscribe(result => {
+                            send(this.setMsgObject(result._parsedResponse));
+                            done();
+                        }, err => {
+                            done(err);
+                        });
                 }
             });
         }
@@ -28,6 +29,10 @@ module.exports = function (RED) {
             msg.payload = data;
             return msg.payload === null ? null : msg;
         }
+        listener(data) {
+            // do nothing, no events for open-doors-windows
+        }
+
     }
-    RED.nodes.registerType('shc-opendoors', SHCOpenDoorsNode);
+    RED.nodes.registerType('shc-opendoors', SHCOpendoorsNode);
 };
