@@ -110,15 +110,23 @@ Example payload to trigger the device state change
 
 ![Trigger state device](docs/trigger_setpointTemperature.png)
 
+## OpenDoorsWindows Node
+
+Use this node to get open doors and windows.
+
+![OpenDoorsWindows node](docs/open_doors_node.png)
+
 ## Scenario Node
 
 Use this node to trigger the defined scenario. Each **msg** can be used as a trigger. This node sends an event message when the defined scenario has been triggered.
 
 ![Scenario node](docs/scenario_node.png)
 
-## State Node
+## User Defined State Node
 
-Use this node to get/set user defined states. Use true/false to enable/disable a state.
+Use this node to get/set user defined states. Use true/false to enable/disable a state, everything else to get the state. This node sends an event message when the defined state has been changed.
+
+![State node](docs/state_node.png)
 
 ## Faults Node
 
