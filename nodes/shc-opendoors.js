@@ -9,6 +9,7 @@ module.exports = function (RED) {
                 this.shcConfig.checkConnection(this);
                 this.shcConfig.registerListener(this);
             }
+
             /**
              * Get Opendoors state
              */
@@ -24,15 +25,16 @@ module.exports = function (RED) {
                 }
             });
         }
+
         setMsgObject(data) {
-            const msg = {topic: (this.name )};
+            const msg = {topic: (this.name)};
             msg.payload = data;
             return msg.payload === null ? null : msg;
         }
-        listener(data) {
+
+        listener() {
             // do nothing, no events for open-doors-windows
         }
-
     }
     RED.nodes.registerType('shc-opendoors', SHCOpendoorsNode);
 };

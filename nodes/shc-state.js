@@ -11,6 +11,7 @@ module.exports = function (RED) {
                 this.shcConfig.checkConnection(this);
                 this.shcConfig.registerListener(this);
             }
+
             /**
              * Enable/disable user defined state if payload is boolean, otherwise get the state
              */
@@ -29,6 +30,7 @@ module.exports = function (RED) {
                                 if (result._parsedResponse) {
                                     send(this.setMsgObject(result._parsedResponse));
                                 }
+
                                 done();
                             }, err => {
                                 done(err);
@@ -37,11 +39,13 @@ module.exports = function (RED) {
                 }
             });
         }
+
         setMsgObject(data) {
             const msg = {topic: (this.name || this.stateName)};
             msg.payload = data;
             return msg.payload === null ? null : msg;
         }
+
         listener(data) {
             const parsed = JSON.parse(JSON.stringify(data));
             parsed.forEach(event => {
