@@ -1,0 +1,39 @@
+<script type="text/javascript">
+    RED.nodes.registerType('shc-opendoors', {
+        category: 'BoschSmartHome',
+        color: '#0096ff',
+        defaults: {
+            shc: {
+                value: '',
+                type: 'shc-config',
+                required: true
+            },
+            name: {
+                value: ''
+            }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'envelope.png',
+        label: function() {
+            return this.name || 'Open Doors-Windows';
+        },
+        paletteLabel: 'open-doors-windows'
+    });
+</script>
+
+<script type="text/x-red" data-template-name="shc-opendoors">
+    <div class="form-row">
+        <label for="node-input-shc"><i class="fa fa-server"></i> SHC</label>
+        <input type="text" id="node-input-shc">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="shc-opendoors">
+    <p>Get open doors / windows.</p>
+</script>
