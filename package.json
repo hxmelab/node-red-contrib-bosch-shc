@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-bosch-shc",
-  "version": "0.5.34",
+  "version": "0.6.35",
   "description": "Bosch Smart Home Controller (SHC) nodes for Node-Red",
   "repository": "https://github.com/hxmelab/node-red-contrib-bosch-shc",
   "main": "none",
@@ -27,6 +27,7 @@
   "node-red": {
     "version": ">=1.0.0",
     "nodes": {
+      "shc-automation": "nodes/shc-automation.js",
       "shc-config": "nodes/shc-config.js",
       "shc-device": "nodes/shc-device.js",
       "shc-opendoors": "nodes/shc-opendoors.js",
@@ -39,7 +40,7 @@
     "node": ">=12.5.0"
   },
   "dependencies": {
-    "bosch-smart-home-bridge": "1.4.1",
+    "bosch-smart-home-bridge": "1.4.2",
     "node-dns-sd": "1.0.1"
   },
   "devDependencies": {
