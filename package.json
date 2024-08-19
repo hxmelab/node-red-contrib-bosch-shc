@@ -40,7 +40,7 @@
     "node": ">=12.5.0"
   },
   "dependencies": {
-    "bosch-smart-home-bridge": "1.4.2",
+    "bosch-smart-home-bridge": "1.6.0",
     "node-dns-sd": "1.0.1"
   },
   "devDependencies": {
