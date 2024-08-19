@@ -1,12 +1,12 @@
 'use strict';
 
 module.exports = function (RED) {
-    class SHCScenarioNode {
+    class SHCAutomationNode {
         constructor(config) {
             RED.nodes.createNode(this, config);
 
-            this.scenarioName = config.scenario.split('|')[0];
-            this.scenarioId = config.scenario.split('|')[1];
+            this.automationName = config.automation.split('|')[0];
+            this.automationId = config.automation.split('|')[1];
             this.name = config.name;
             this.shcConfig = RED.nodes.getNode(config.shc);
 
@@ -16,12 +16,12 @@ module.exports = function (RED) {
             }
 
             /**
-             * Any input msg triggers the configured scenario
+             * Any input msg triggers the configured automation
              */
             this.on('input', (msg, send, done) => {
-                if (this.scenarioId && this.shcConfig && this.shcConfig.connected) {
+                if (this.automationId && this.shcConfig && this.shcConfig.connected) {
                     this.shcConfig.shc.getBshcClient()
-                        .triggerScenario(this.scenarioId).subscribe(() => {
+                        .triggerAutomation(this.automationId).subscribe(() => {
                             done();
                         }, err => {
                             done(err);
@@ -31,7 +31,7 @@ module.exports = function (RED) {
         }
 
         setMsgObject(data) {
-            const msg = {topic: (this.name || this.scenarioName)};
+            const msg = {topic: (this.name || this.automationName)};
             msg.payload = data;
             return msg.payload === null ? null : msg;
         }
@@ -39,12 +39,12 @@ module.exports = function (RED) {
         listener(data) {
             const parsed = JSON.parse(JSON.stringify(data));
             parsed.forEach(event => {
-                if (event.id && this.scenarioId === event.id) {
+                if (event.id && this.automationId === event.id) {
                     this.send(this.setMsgObject(event));
                 }
             });
         }
     }
 
-    RED.nodes.registerType('shc-scenario', SHCScenarioNode);
+    RED.nodes.registerType('shc-automation', SHCAutomationNode);
 };
