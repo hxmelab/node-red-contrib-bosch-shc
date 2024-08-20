@@ -1,0 +1,114 @@
+<script type="text/javascript">
+    RED.nodes.registerType('shc-automation', {
+        category: 'BoschSmartHome',
+        color: '#0096ff',
+        defaults: {
+            shc: {
+                value: '',
+                type: 'shc-config',
+                required: true,
+            },
+            automation: {
+                value: '',
+                required: true,
+            },
+            name: {
+                value: '',
+            },
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: 'inject.png',
+        label() {
+            return this.name || this.automation.split('|')[0] || 'shc automation';
+        },
+        paletteLabel: 'automation',
+        oneditprepare() {
+            const automationBoxId = '#node-input-automation';
+            const automationBoxText = '<input type="text" id="node-input-automation" style="width: 100%;">';
+            const automationBoxSelect = '<select id="node-input-automation" style="width: 100%;" />';
+    
+            function lookupAutomations(value) {
+                const shcConfig = RED.nodes.node($('#node-input-shc').val());
+                const selectAutomation = $('#node-input-automation');
+
+                function format(automation) {
+                    return $('<option/>')
+                        .val(automation.name + '|' + automation.id)
+                        .text(automation.name);
+                }
+    
+                function populate(automations) {
+                    if (automations.length > 0) {
+                        const optGroup = $('<optgroup label="Automations"></optgroup>');
+                        selectAutomation.append(optGroup);
+                        automations.reduce((parent, automation) => {
+                            parent.append(format(automation));
+                            return parent;
+                        }, optGroup);
+                        RED.notify('Got it, please select an automation', 'notice');
+                    } else {
+                        RED.notify('No automation found', 'notice');
+                    }
+                }
+
+                if (shcConfig && shcConfig.state && shcConfig.state === 'PAIRED') {
+                    RED.notify('Requesting automations, please wait...', 'notice');
+    
+                    $.getJSON('shc/automations', {config: shcConfig.id})
+                        .done(automations => {
+                            populate(automations);
+                            $(automationBoxId).val(value);
+                        })
+                        .fail(err => {
+                            RED.notify(err.responseText, 'error');
+                        });
+                } else if (shcConfig) {
+                    RED.notify('Client not added to SHC', 'notice');
+                } else {
+                    RED.notify('Select SHC or create configuration', 'notice');
+                }
+            }
+
+            $('#node-input-lookup-automation').click(() => {
+                const value = $(automationBoxId).val();
+
+                if ($(automationBoxId).attr('type') === 'text') {
+                    $(automationBoxId).replaceWith(automationBoxSelect);
+                    lookupAutomations(value);
+                } else {
+                    $(automationBoxId).replaceWith(automationBoxText);
+                    $(automationBoxId).val(value);
+                }
+            });
+        },
+    });
+</script>
+
+<script type="text/x-red" data-template-name="shc-automation">
+    <div class="form-row">
+        <label for="node-input-shc"><i class="fa fa-server"></i> SHC</label>
+        <input type="text" id="node-input-shc">
+    </div>
+
+    <div class="form-row" style="white-space: nowrap;">
+        <label for="node-input-automation"><i class="fa fa-tasks"></i> Automation</label>
+        <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+          <div style="position: absolute; left: 0px; right: 40px;">
+            <input type="text" id="node-input-automation" placeholder="No automation specified" style="width: 100%;" />
+          </div>
+          <a id="node-input-lookup-automation" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
+            <i class="fa fa-search"></i>
+          </a>
+        </div>
+    </div>
+    
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name" />
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="shc-automation">
+    <p>Any message input will trigger the configured automation.</p>
+</script>

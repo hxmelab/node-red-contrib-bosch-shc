@@ -118,6 +118,12 @@ Use this node to get open doors and windows.
 
 ![OpenDoorsWindows node](docs/open_doors_node.png)
 
+## Automation Node
+
+Use this node to trigger the defined automation. Each **msg** can be used as a trigger. This node sends an event message when the defined automation has been triggered.
+
+![Automation node](docs/automation_node.png)
+
 ## Scenario Node
 
 Use this node to trigger the defined scenario. Each **msg** can be used as a trigger. This node sends an event message when the defined scenario has been triggered.
