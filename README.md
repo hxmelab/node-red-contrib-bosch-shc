@@ -19,6 +19,7 @@ Example flows can be found [here](https://flows.nodered.org/flow/01271a01a6b647b
 **Compatible with Node-RED version 1.0.0 or higher.**
 
 ### Release Notes
+Version **0.6.35** adds a new node for triggering automations.
 
 Version **0.4.33** adds two new nodes: for Open doors/windows and for User Defined States.
 
