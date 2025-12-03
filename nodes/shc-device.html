@@ -60,7 +60,12 @@
                     let services = '';
 
                     try {
-                        services = device.deviceServiceIds.filter(element => supportedServices.includes(element)).reduce((acc, element) => acc + ',' + element);
+                        services = device.deviceServiceIds.filter(element => supportedServices.includes(element));
+                        if (services && services.length > 0) {
+                            services = services.reduce((acc, element) => acc + ',' + element);
+                        } else {
+                            services = "not supported";
+                        }
                     } catch (error) {
                         console.log(error);
                         RED.notify('Unexpected Device Service Array', 'error');
