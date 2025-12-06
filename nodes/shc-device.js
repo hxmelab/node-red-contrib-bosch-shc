@@ -37,8 +37,10 @@ module.exports = function (RED) {
                             // Add method to handle multiple actions, e.g. reset all power meters
                             done();
                         } else {
-                            this.shcConfig.shc.getBshcClient().putState(this.getPath(),
-                                this.getServiceBody(msg.payload)).subscribe(result => {
+                            this.shcConfig.shc.getBshcClient().putState(
+                                this.getPath(),
+                                this.getServiceBody(msg.payload),
+                            ).subscribe(result => {
                                 if (result._parsedResponse && result._parsedResponse.message) {
                                     send({topic: this.deviceName, payload: result._parsedResponse.message});
                                 }
@@ -126,11 +128,11 @@ module.exports = function (RED) {
 
         isRelevant(msg) {
             return ((msg['@type'] === 'DeviceServiceData' && this.deviceId === 'all' && this.serviceId === 'all')
-                    || (msg['@type'] === 'device' && this.deviceId === 'all' && !this.serviceId)
-                    || (msg['@type'] === 'DeviceServiceData' && this.deviceId === 'all' && this.serviceId === msg.id)
-                    || (msg['@type'] === 'DeviceServiceData' && this.deviceId === msg.deviceId && this.serviceId === 'all')
-                    || (msg['@type'] === 'device' && this.deviceId === msg.id && !this.serviceId)
-                    || (msg['@type'] === 'DeviceServiceData' && this.deviceId === msg.deviceId && this.serviceId === msg.id));
+                || (msg['@type'] === 'device' && this.deviceId === 'all' && !this.serviceId)
+                || (msg['@type'] === 'DeviceServiceData' && this.deviceId === 'all' && this.serviceId === msg.id)
+                || (msg['@type'] === 'DeviceServiceData' && this.deviceId === msg.deviceId && this.serviceId === 'all')
+                || (msg['@type'] === 'device' && this.deviceId === msg.id && !this.serviceId)
+                || (msg['@type'] === 'DeviceServiceData' && this.deviceId === msg.deviceId && this.serviceId === msg.id));
         }
 
         isValid(newState) {
@@ -144,90 +146,90 @@ module.exports = function (RED) {
                 case 'CameraNotification':
                 case 'CameraLight':
                 case 'IntrusionDetectionControl':
-                case 'PresenceSimulationConfiguration': { return (typeof newState === 'boolean');
+                case 'PresenceSimulationConfiguration': {return (typeof newState === 'boolean');
                 }
 
-                case 'ShutterControl': { return (typeof newState === 'number' && newState >= 0 && newState <= 1) || typeof newState === 'string';
+                case 'ShutterControl': {return (typeof newState === 'number' && newState >= 0 && newState <= 1) || typeof newState === 'string';
                 }
 
                 case 'HeatingCircuit':
-                case 'RoomClimateControl': { return (typeof newState === 'number' && newState >= 5 && newState <= 30);
+                case 'RoomClimateControl': {return (typeof newState === 'number' && newState >= 5 && newState <= 30);
                 }
 
-                case 'MultiLevelSwitch': { return (typeof newState === 'number' && newState >= 0 && newState <= 100);
+                case 'MultiLevelSwitch': {return (typeof newState === 'number' && newState >= 0 && newState <= 100);
                 }
 
-                case 'HSBColorActuator': { return (typeof newState === 'number' && newState < 0);
+                case 'HSBColorActuator': {return (typeof newState === 'number' && newState < 0);
                 }
 
-                case 'HueColorTemperature': { return (typeof newState === 'number' && newState > 152 && newState < 501);
+                case 'HueColorTemperature': {return (typeof newState === 'number' && newState > 152 && newState < 501);
                 }
 
-                default: { return false;
+                default: {return false;
                 }
             }
         }
 
         getServiceBody(newState) {
             switch (this.serviceId) {
-                case 'BinarySwitch': { return {'@type': 'binarySwitchState', on: newState};
+                case 'BinarySwitch': {return {'@type': 'binarySwitchState', on: newState};
                 }
 
-                case 'MultiLevelSwitch': { return {'@type': 'multiLevelSwitchState', level: newState};
+                case 'MultiLevelSwitch': {return {'@type': 'multiLevelSwitchState', level: newState};
                 }
 
-                case 'HSBColorActuator': { return {'@type': 'colorState', rgb: newState};
+                case 'HSBColorActuator': {return {'@type': 'colorState', rgb: newState};
                 }
 
-                case 'HueColorTemperature': { return {'@type': 'colorTemperatureState', colorTemperature: newState};
+                case 'HueColorTemperature': {return {'@type': 'colorTemperatureState', colorTemperature: newState};
                 }
 
-                case 'HueBlinkingActuator': { return {'@type': 'hueBlinkingState', blinkingState: (newState ? 'ON' : 'OFF')};
+                case 'HueBlinkingActuator': {return {'@type': 'hueBlinkingState', blinkingState: (newState ? 'ON' : 'OFF')};
                 }
 
-                case 'SmokeDetectorCheck': { return {'@type': 'smokeDetectorCheckState', value: 'SMOKE_TEST_REQUESTED'};
+                case 'SmokeDetectorCheck': {return {'@type': 'smokeDetectorCheckState', value: 'SMOKE_TEST_REQUESTED'};
                 }
 
-                case 'PowerSwitch': { return {'@type': 'powerSwitchState', switchState: (newState ? 'ON' : 'OFF')};
+                case 'PowerSwitch': {return {'@type': 'powerSwitchState', switchState: (newState ? 'ON' : 'OFF')};
                 }
 
-                case 'PowerMeter': { return {'@type': 'powerMeterState', energyConsumption: 0};
+                case 'PowerMeter': {return {'@type': 'powerMeterState', energyConsumption: 0};
                 }
 
-                case 'HeatingCircuit': { return {'@type': 'heatingCircuitState', setpointTemperature: (newState * 2).toFixed(0) / 2};
+                case 'HeatingCircuit': {return {'@type': 'heatingCircuitState', setpointTemperature: (newState * 2).toFixed(0) / 2};
                 }
 
-                case 'RoomClimateControl': { return {'@type': 'climateControlState', setpointTemperature: (newState * 2).toFixed(0) / 2};
+                case 'RoomClimateControl': {return {'@type': 'climateControlState', setpointTemperature: (newState * 2).toFixed(0) / 2};
                 }
 
-                case 'PrivacyMode': { return {'@type': 'privacyModeState', value: (newState ? 'DISABLED' : 'ENABLED')};
+                case 'PrivacyMode': {return {'@type': 'privacyModeState', value: (newState ? 'DISABLED' : 'ENABLED')};
                 }
 
-                case 'CameraNotification': { return {'@type': 'cameraNotificationState', value: (newState ? 'DISABLED' : 'ENABLED')};
+                case 'CameraNotification': {return {'@type': 'cameraNotificationState', value: (newState ? 'DISABLED' : 'ENABLED')};
                 }
 
-                case 'CameraLight': { return {'@type': 'cameraLightState', value: (newState ? 'ON' : 'OFF')};
+                case 'CameraLight': {return {'@type': 'cameraLightState', value: (newState ? 'ON' : 'OFF')};
                 }
 
-                case 'IntrusionDetectionControl': { return {'@type': 'intrusionDetectionControlState', value: (newState ? 'SYSTEM_ARMED' : 'SYSTEM_DISARMED')};
+                case 'IntrusionDetectionControl': {return {'@type': 'intrusionDetectionControlState', value: (newState ? 'SYSTEM_ARMED' : 'SYSTEM_DISARMED')};
                 }
 
-                case 'PresenceSimulationConfiguration': { return {'@type': 'presenceSimulationConfigurationState', enabled: newState};
+                case 'PresenceSimulationConfiguration': {return {'@type': 'presenceSimulationConfigurationState', enabled: newState};
                 }
 
                 case 'ShutterControl': {
                     if (typeof newState === 'string') {
                         switch (newState.toUpperCase()) {
-                            case 'STOP': { return {'@type': 'shutterControlState', operationState: 'STOPPED'};
+                            case 'STOP': {return {'@type': 'shutterControlState', operationState: 'STOPPED'};
                             }
 
-                            case 'OPEN': { return {'@type': 'shutterControlState', level: 1};
+                            case 'OPEN': {return {'@type': 'shutterControlState', level: 1};
                             }
 
-                            case 'CLOSE': { return {'@type': 'shutterControlState', level: 0};
+                            case 'CLOSE': {return {'@type': 'shutterControlState', level: 0};
                             }
 
-                            default: { return false;
+                            default: {return false;
                             }
                         }
                     }
@@ -235,7 +237,7 @@ module.exports = function (RED) {
                     return {'@type': 'shutterControlState', level: newState};
                 }
 
-                default: { return false;
+                default: {return false;
                 }
             }
         }

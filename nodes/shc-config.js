@@ -59,11 +59,11 @@ module.exports = function (RED) {
 
             if (err && Number.isInteger(err.errorType)) {
                 switch (err.errorType) {
-                    case 3: { this.pollid = null;
+                    case 3: {this.pollid = null;
                         break;
                     }
 
-                    default: { this.error(err + ' Type ' + err.errorType + ', Try to reconnect...');
+                    default: {this.error(err + ' Type ' + err.errorType + ', Try to reconnect...');
                     }
                 }
             } else if (err) {
