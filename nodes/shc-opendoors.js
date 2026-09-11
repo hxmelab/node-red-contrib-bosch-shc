@@ -14,14 +14,22 @@ module.exports = function (RED) {
              * Get Opendoors state
              */
             this.on('input', (msg, send, done) => {
+                const finish = err => {
+                    if (done) {
+                        done(err);
+                    }
+                };
+
                 if (this.shcConfig && this.shcConfig.connected) {
                     this.shcConfig.shc.getBshcClient()
                         .getOpenWindows().subscribe(result => {
                             send(this.setMsgObject(result._parsedResponse));
-                            done();
+                            finish();
                         }, err => {
-                            done(err);
+                            finish(err);
                         });
+                } else {
+                    finish();
                 }
             });
         }

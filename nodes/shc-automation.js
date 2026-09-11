@@ -19,13 +19,21 @@ module.exports = function (RED) {
              * Any input msg triggers the configured automation
              */
             this.on('input', (msg, send, done) => {
+                const finish = err => {
+                    if (done) {
+                        done(err);
+                    }
+                };
+
                 if (this.automationId && this.shcConfig && this.shcConfig.connected) {
                     this.shcConfig.shc.getBshcClient()
                         .triggerAutomation(this.automationId).subscribe(() => {
-                            done();
+                            finish();
                         }, err => {
-                            done(err);
+                            finish(err);
                         });
+                } else {
+                    finish();
                 }
             });
         }
