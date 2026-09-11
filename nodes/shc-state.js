@@ -16,13 +16,19 @@ module.exports = function (RED) {
              * Enable/disable user defined state if payload is boolean, otherwise get the state
              */
             this.on('input', (msg, send, done) => {
+                const finish = err => {
+                    if (done) {
+                        done(err);
+                    }
+                };
+
                 if (this.stateId && this.shcConfig && this.shcConfig.connected) {
                     if (typeof msg.payload === 'boolean') {
                         this.shcConfig.shc.getBshcClient()
                             .setUserDefinedState(this.stateId, msg.payload).subscribe(() => {
-                                done();
+                                finish();
                             }, err => {
-                                done(err);
+                                finish(err);
                             });
                     } else {
                         this.shcConfig.shc.getBshcClient()
@@ -31,11 +37,13 @@ module.exports = function (RED) {
                                     send(this.setMsgObject(result._parsedResponse));
                                 }
 
-                                done();
+                                finish();
                             }, err => {
-                                done(err);
+                                finish(err);
                             });
                     }
+                } else {
+                    finish();
                 }
             });
         }

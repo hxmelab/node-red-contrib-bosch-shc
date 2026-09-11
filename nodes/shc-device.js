@@ -30,12 +30,18 @@ module.exports = function (RED) {
              *  Handle node input
              */
             this.on('input', (msg, send, done) => {
+                const finish = err => {
+                    if (done) {
+                        done(err);
+                    }
+                };
+
                 if (this.shcConfig && this.shcConfig.connected) {
                     // Set a state on a single device service
                     if (this.isValid(msg.payload) && this.serviceId && this.getServiceBody(msg.payload)) {
                         if (this.deviceId === 'all') {
                             // Add method to handle multiple actions, e.g. reset all power meters
-                            done();
+                            finish();
                         } else {
                             this.shcConfig.shc.getBshcClient().putState(
                                 this.getPath(),
@@ -45,9 +51,9 @@ module.exports = function (RED) {
                                     send({topic: this.deviceName, payload: result._parsedResponse.message});
                                 }
 
-                                done();
+                                finish();
                             }, err => {
-                                done(err);
+                                finish(err);
                             });
                         }
                         // Get all device services regardless of a device
@@ -67,9 +73,9 @@ module.exports = function (RED) {
 
                                     return null;
                                 })));
-                                done();
+                                finish();
                             }, err => {
-                                done(err);
+                                finish(err);
                             });
                         // Get one or all device services of a specific device
                     } else if (this.deviceId && this.serviceId) {
@@ -83,20 +89,24 @@ module.exports = function (RED) {
                                     send(this.setMsgObject(result._parsedResponse));
                                 }
 
-                                done();
+                                finish();
                             }, err => {
-                                done(err);
+                                finish(err);
                             });
                         // Get the device meta data of a specific device or of all devices
                     } else if (this.deviceId) {
                         this.shcConfig.shc.getBshcClient()
                             .getDevice(this.deviceId === 'all' ? undefined : this.deviceId).subscribe(result => {
                                 send(this.setMsgObject(result._parsedResponse));
-                                done();
+                                finish();
                             }, err => {
-                                done(err);
+                                finish(err);
                             });
+                    } else {
+                        finish();
                     }
+                } else {
+                    finish();
                 }
             });
         }
