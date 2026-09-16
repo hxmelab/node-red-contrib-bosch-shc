@@ -21,6 +21,7 @@ module.exports = function (RED) {
 
             this.pollid = null;
             this.connected = false;
+            this.reconnectTimeout = null;
             this.on('close', this.destructor);
 
             if (this.state === 'PAIRED') {
@@ -43,6 +44,11 @@ module.exports = function (RED) {
         }
 
         async destructor(done) {
+            if (this.reconnectTimeout) {
+                clearTimeout(this.reconnectTimeout);
+                this.reconnectTimeout = null;
+            }
+
             await this.unsubscribe();
             this.shc = null;
             this.pollid = null;
@@ -70,7 +76,11 @@ module.exports = function (RED) {
                 this.error(err);
             }
 
-            setTimeout(() => {
+            if (this.reconnectTimeout) {
+                clearTimeout(this.reconnectTimeout);
+            }
+
+            this.reconnectTimeout = setTimeout(() => {
                 this.poll();
             }, 20_000);
         }
@@ -118,6 +128,10 @@ module.exports = function (RED) {
         }
 
         poll() {
+            if (!this.shc) {
+                return;
+            }
+
             if (this.pollid) {
                 this.shc.getBshcClient().longPolling(this.pollid).subscribe(data => {
                     this.connected = true;
@@ -137,11 +151,19 @@ module.exports = function (RED) {
 
         unsubscribe() {
             return new Promise(resolve => {
-                if (this.state === 'PAIRED' && this.pollid) {
-                    this.shc.getBshcClient().unsubscribe(this.pollid).subscribe(() => {
-                        this.log('Unsubscribed SHC: ' + this.shcip + ' with poll Id: ' + this.pollid);
+                if (this.state === 'PAIRED' && this.pollid && this.shc) {
+                    try {
+                        this.shc.getBshcClient().unsubscribe(this.pollid).subscribe(() => {
+                            this.log('Unsubscribed SHC: ' + this.shcip + ' with poll Id: ' + this.pollid);
+                            resolve();
+                        }, err => {
+                            this.log('Unsubscribe from SHC failed (ignored): ' + (err && err.message ? err.message : err));
+                            resolve();
+                        });
+                    } catch (error) {
+                        this.log('Unsubscribe error (ignored): ' + (error && error.message ? error.message : error));
                         resolve();
-                    });
+                    }
                 } else {
                     resolve();
                 }
@@ -191,42 +213,67 @@ module.exports = function (RED) {
     /**
      * Webhook for generating a certificate and a key
      */
-    RED.httpAdmin.get('/shc/tls', RED.auth.needsPermission('shc.read'), (req, result) => {
+    RED.httpAdmin.get('/shc/tls', RED.auth.needsPermission('shc.read'), async (req, result) => {
         result.set({'content-type': 'application/json; charset=utf-8'});
-        result.end(JSON.stringify(BshbUtils.generateClientCertificate()));
+        try {
+            const certData = await BshbUtils.generateClientCertificate();
+            result.end(JSON.stringify(certData));
+        } catch (error) {
+            result.status(500).end(JSON.stringify({error: error.message}));
+        }
     });
 
     /**
      * Webhook to add a client
      */
     RED.httpAdmin.get('/shc/client', RED.auth.needsPermission('shc.write'), (req, result) => {
-        const shc = BoschSmartHomeBridgeBuilder.builder()
-            .withHost(req.query.shcip)
-            .withClientCert(req.query.cert)
-            .withClientPrivateKey(req.query.key)
-            .withLogger(new ShcLogger())
-            .build();
-
         result.set({'content-type': 'text/plain; charset=utf-8'});
-        shc.pairIfNeeded(req.query.clientname, req.query.clientid, req.query.password, 0, -1).subscribe(res => {
-            if (res && res._parsedResponse && res._parsedResponse && res._parsedResponse.token) {
-                result.end('PAIRED');
-            } else {
-                result.end('Please check your password.');
+
+        const {cert, key, shcip, clientname, clientid} = req.query;
+        if (!cert || !key || !shcip) {
+            result.end('Certificate, private key or SHC IP is missing.');
+            return;
+        }
+
+        let {password} = req.query;
+        if ((!password || password === '__PWRD__') && req.query.id) {
+            const credentials = RED.nodes.getCredentials(req.query.id);
+            if (credentials && credentials.password) {
+                password = credentials.password;
             }
-        }, err => {
-            // EPROTO should be SSL alert number 42
-            if (err.cause && err.cause.code && err.cause.code === 'EPROTO') {
-                result.end('SHC detected, but it’s not ready to connect. Please enable pairing mode on your SHC and try again.');
-            } else if (err.cause && err.cause.code && err.cause.code === 'EHOSTUNREACH') {
-                result.end('Unable to reach your device. Please verify the IP address and ensure your device is connected to the network.');
-            } else if (err.cause && err.cause.code && err.cause.code === 'ECONNREFUSED') {
-                result.end('Found a device, but it’s not a SHC. Please double-check the IP address and make sure the device is powered on.');
-            } else {
-                console.log(err);
-                result.end('ERROR - Please check logs');
-            }
-        });
+        }
+
+        try {
+            const shc = BoschSmartHomeBridgeBuilder.builder()
+                .withHost(shcip)
+                .withClientCert(cert)
+                .withClientPrivateKey(key)
+                .withLogger(new ShcLogger())
+                .build();
+
+            shc.pairIfNeeded(clientname, clientid, password, 0, -1).subscribe(res => {
+                if (res && res._parsedResponse && res._parsedResponse.token) {
+                    result.end('PAIRED');
+                } else {
+                    result.end('Please check your password.');
+                }
+            }, err => {
+                // EPROTO should be SSL alert number 42
+                if (err.cause && err.cause.code && err.cause.code === 'EPROTO') {
+                    result.end('SHC detected, but it’s not ready to connect. Please enable pairing mode on your SHC and try again.');
+                } else if (err.cause && err.cause.code && err.cause.code === 'EHOSTUNREACH') {
+                    result.end('Unable to reach your device. Please verify the IP address and ensure your device is connected to the network.');
+                } else if (err.cause && err.cause.code && err.cause.code === 'ECONNREFUSED') {
+                    result.end('Found a device, but it’s not a SHC. Please double-check the IP address and make sure the device is powered on.');
+                } else {
+                    console.log(err);
+                    result.end('ERROR - Please check logs');
+                }
+            });
+        } catch (error) {
+            console.log(error);
+            result.end('ERROR - ' + error.message);
+        }
     });
 
     /**
