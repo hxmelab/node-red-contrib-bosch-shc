@@ -112,8 +112,8 @@
                 const state = $('#node-config-input-state').val();
 
                 if (shcip.trim().length === 0
-                || clientid.trim().length === 0
-                || clientname.trim().length === 0) {
+                    || clientid.trim().length === 0
+                    || clientname.trim().length === 0) {
                     RED.notify('Some information are missing', 'error');
                 } else {
                     RED.notify('POST New Client', 'notice');
@@ -121,7 +121,7 @@
                         RED.notify('Client already paired', 'notice');
                     } else {
                         $.get('shc/client', {
-                            shcip, clientid, clientname, password, key, cert,
+                            shcip, clientid, clientname, password, key, cert, id: this.id,
                         }).done(data => {
                             if (data === 'PAIRED') {
                                 RED.notify(data, 'notice');
@@ -137,6 +137,67 @@
                     }
                 }
             });
+
+            $('#node-input-repair-shc').click(() => {
+                const shcip = $('#node-config-input-shcip').val();
+                const clientid = $('#node-config-input-clientid').val();
+                const clientname = $('#node-config-input-clientname').val();
+                const password = $('#node-config-input-password').val();
+
+                if (shcip.trim().length === 0
+                    || clientid.trim().length === 0
+                    || clientname.trim().length === 0) {
+                    RED.notify('Some information are missing', 'error');
+                    return;
+                }
+
+                const $repairButton = $('#node-input-repair-shc');
+                if ($repairButton.hasClass('disabled')) {
+                    return;
+                }
+
+                $repairButton.addClass('disabled');
+                RED.notify('Generating new client certificate. Please wait...', 'notice');
+
+                $.getJSON('shc/tls', {})
+                    .done(tlsData => {
+                        if (!tlsData || !tlsData.cert || !tlsData.private) {
+                            $repairButton.removeClass('disabled');
+                            RED.notify('Failed to generate valid certificate data', 'error');
+                            return;
+                        }
+
+                        $('#node-config-input-key').val(tlsData.private);
+                        $('#node-config-input-cert').val(tlsData.cert);
+                        RED.notify('New certificate generated. Posting client to SHC...', 'notice');
+
+                        $.get('shc/client', {
+                            shcip,
+                            clientid,
+                            clientname,
+                            password,
+                            key: tlsData.private,
+                            cert: tlsData.cert,
+                            id: this.id,
+                        }).done(data => {
+                            if (data === 'PAIRED') {
+                                RED.notify('Re-paired successfully! Client is PAIRED.', 'notice');
+                            } else {
+                                RED.notify(data, 'error');
+                            }
+
+                            $('#node-config-input-state').val(data);
+                        }).fail(err => {
+                            RED.notify(err.responseText || 'Error during re-pairing', 'error');
+                        }).always(() => {
+                            $repairButton.removeClass('disabled');
+                        });
+                    })
+                    .fail(err => {
+                        $repairButton.removeClass('disabled');
+                        RED.notify(err.responseText || 'Failed to generate certificate', 'error');
+                    });
+            });
         },
     });
 </script>
@@ -144,7 +205,7 @@
 <script type="text/html" data-template-name="shc-config">
     <h3>Bosch Smart Home Controller</h3>
     <div class="form-row" style="white-space: nowrap;">
-        <label for="node-config-input-shcip"><i class="fa fa-server"></i> Ip</label>
+        <label for="node-config-input-shcip"><i class="fa fa-server"></i> IP</label>
         <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
             <div style="position: absolute; left: 0px; right: 40px;">
                 <input type="text" id="node-config-input-shcip" placeholder="192.168.0.10" style="width: 100%;">
@@ -162,7 +223,7 @@
     <div class="form-tips"><b>Hint:</b> Please use the Bosch Smart Home App to delete a client.</div>
     <div style="height:10px;"></div>
     <div class="form-row">
-        <label for="node-config-input-clientid"><i class="fa fa-user"></i> Id</label>
+        <label for="node-config-input-clientid"><i class="fa fa-user"></i> ID</label>
         <input type="text" id="node-config-input-clientid" disabled>
     </div>
     <div class="form-row">
@@ -171,7 +232,7 @@
     </div>
 
     <h3>Pairing</h3>
-    <div class="form-tips">Ready to connect? Please activate pairing mode on your SHC first. Then, you can hit the 'Pair' button!</div>
+    <div class="form-tips">Ready to connect? Please activate pairing mode on your SHC first. Then, hit the 'Pair' button!</div>
     <div style="height:10px;"></div>
     <div class="form-row">
         <label for="node-config-input-state"><i class="fa fa-handshake-o"></i> State</label>
@@ -182,6 +243,14 @@
             <a id="node-input-pair-shc" title="Register User" class="editor-button" style="position: absolute; right: 0px; top: 0px;">
             Pair</a>
         </div>
+    </div>
+
+    <h3>Re-Pair</h3>
+    <div class="form-tips">If you need to repair an existing configuration, please ensure this client has been deleted in the Bosch Smart Home App first. Activate pairing mode on your SHC, then click 'Re-Pair'.</div>
+    <div style="height:10px;"></div>
+    <div class="form-row">
+        <label> <i class="fa fa-refresh"></i> Connection</label>
+        <a id="node-input-repair-shc" title="Re-Pair with SHC" class="editor-button"> Re-Pair</a>
     </div>
 
     <input type="hidden" id="node-config-input-key">
