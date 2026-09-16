@@ -16,9 +16,15 @@ A full documentation of the API can be found [here](https://local.apidocs.bosch-
 
 Example flows can be found [here](https://flows.nodered.org/flow/01271a01a6b647b7b7cfda67c332cfbc).
 
-**Compatible with Node-RED version 1.0.0 or higher.**
+**Compatible with Node-RED version 1.0.0 or higher and Node.js >= 18.0.0.**
 
 ### Release Notes
+Version **0.8.39** adds a  **Re-Pairing function** in the `shc-config` node. This allows re-authenticating with the SHC if connection credentials expired or were reset (after removing the client in the Bosch Smart Home App), without needing to recreate configuration nodes or rewire existing flows. Also includes improved connection lifecycle handling and asynchronous certificate creation.
+
+Version **0.7.38** improves flow stability across all nodes by properly invoking Node-RED `done()` message callbacks to prevent hanging flows and resource leaks.
+
+Version **0.6.36** fixes querying states and services when selecting all devices.
+
 Version **0.6.35** adds a new node for triggering automations.
 
 Version **0.4.33** adds two new nodes: for Open doors/windows and for User Defined States.
